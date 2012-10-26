@@ -8,6 +8,7 @@ import fr.paris.lutece.plugins.directory.business.DirectoryFilter;
 import fr.paris.lutece.plugins.directory.business.DirectoryHome;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
 import fr.paris.lutece.plugins.fdw.modules.wizard.business.FormWithDirectory;
+import fr.paris.lutece.plugins.fdw.modules.wizard.service.DuplicationManager;
 import fr.paris.lutece.plugins.form.business.Form;
 import fr.paris.lutece.plugins.form.business.FormFilter;
 import fr.paris.lutece.plugins.form.business.FormHome;
@@ -362,7 +363,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
         Directory directory = null;
         UrlItem url = null;
 
-        if ( nIdDirectory != WorkflowUtils.CONSTANT_ID_NULL )
+        if ( nIdDirectory != DirectoryUtils.CONSTANT_ID_NULL )
         {
             directory = DirectoryHome.findByPrimaryKey( nIdDirectory, getPlugin( ) );
         }
@@ -380,13 +381,23 @@ public class WizardJspBean extends PluginAdminPageJspBean
             if ( COPY_MODE_DIRECTORY_ONLY.equals( strCopyMode ) )
             {
                 // simple copy
-                doCopyDirectory( directory, strDirectoryCopyTitle );
+                int nIdDirectoryCopy = doCopyDirectory( directory, strDirectoryCopyTitle );
+
+                doExtraDuplication( DirectoryUtils.CONSTANT_ID_NULL, DirectoryUtils.CONSTANT_ID_NULL, nIdDirectory,
+                        nIdDirectoryCopy, DirectoryUtils.CONSTANT_ID_NULL, DirectoryUtils.CONSTANT_ID_NULL );
+
             }
             else if ( COPY_MODE_DIRECTORY_WITH_WORKFLOW.equals( strCopyMode ) )
             {
                 // copy with workflow
+                int nIdWorkflowToCopy = directory.getIdWorkflow( );
                 String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
-                doCopyDirectoryWithWorkflow( directory, strDirectoryCopyTitle, strWorkflowCopyTitle );
+                int nIdDirectoryCopy = doCopyDirectoryWithWorkflow( directory, strDirectoryCopyTitle,
+                        strWorkflowCopyTitle );
+                int nIdWorkflowCopy = directory.getIdWorkflow( );
+
+                doExtraDuplication( DirectoryUtils.CONSTANT_ID_NULL, DirectoryUtils.CONSTANT_ID_NULL, nIdDirectory,
+                        nIdDirectoryCopy, nIdWorkflowToCopy, nIdWorkflowCopy );
             }
 
             // success
@@ -559,7 +570,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
 
     /**
      * Gets the directory associted to a given form
-     * @param form th form
+     * @param form the form
      * @return the directory or null if no directory found
      */
     private Directory getDirectoryAssociatedTo( Form form )
@@ -1113,5 +1124,55 @@ public class WizardJspBean extends PluginAdminPageJspBean
         // TODO copy export-directory
 
         return nIdFormCopy;
+    }
+
+    /**
+     * Performs extra duplications, parameters must be set to -1 if not needed
+     * @param nIdFormToCopy
+     * @param nIdCopyOfForm
+     * @param nIdDirectoryToCopy
+     * @param nIdCopyOfDirectory
+     * @param nIdWorkflowToCopy
+     * @param nIdCopyOfWorkflow
+     */
+    private void doExtraDuplication( int nIdFormToCopy, int nIdCopyOfForm, int nIdDirectoryToCopy,
+            int nIdCopyOfDirectory, int nIdWorkflowToCopy, int nIdCopyOfWorkflow )
+    {
+        Form formToCopy = null;
+        Form copyOfForm = null;
+        Directory directoryToCopy = null;
+        Directory copyOfDirectory = null;
+        Workflow workflowToCopy = null;
+        Workflow copyOfWorkflow = null;
+
+        if ( nIdFormToCopy > 0 )
+        {
+            formToCopy = FormHome.findByPrimaryKey( nIdFormToCopy, getPlugin( ) );
+        }
+        if ( nIdCopyOfForm > 0 )
+        {
+            copyOfForm = FormHome.findByPrimaryKey( nIdCopyOfForm, getPlugin( ) );
+        }
+
+        if ( nIdDirectoryToCopy > 0 )
+        {
+            directoryToCopy = DirectoryHome.findByPrimaryKey( nIdDirectoryToCopy, getPlugin( ) );
+        }
+        if ( nIdCopyOfDirectory > 0 )
+        {
+            copyOfDirectory = DirectoryHome.findByPrimaryKey( nIdCopyOfDirectory, getPlugin( ) );
+        }
+
+        if ( nIdWorkflowToCopy > 0 )
+        {
+            workflowToCopy = _workflowService.findByPrimaryKey( nIdWorkflowToCopy );
+        }
+        if ( nIdCopyOfWorkflow > 0 )
+        {
+            copyOfWorkflow = _workflowService.findByPrimaryKey( nIdCopyOfWorkflow );
+        }
+
+        DuplicationManager.doDuplicate( formToCopy, copyOfForm, directoryToCopy, copyOfDirectory, workflowToCopy,
+                copyOfWorkflow );
     }
 }

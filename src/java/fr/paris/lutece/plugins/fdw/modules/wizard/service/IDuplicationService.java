@@ -33,41 +33,26 @@
  */
 package fr.paris.lutece.plugins.fdw.modules.wizard.service;
 
+import fr.paris.lutece.plugins.directory.business.Directory;
+import fr.paris.lutece.plugins.form.business.Form;
+import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
 
 
 /**
- * 
- * WizardService
+ * Interface for duplication service
  * 
  */
-public class WizardService
+public interface IDuplicationService
 {
-
-    private static WizardService _singleton;
-
     /**
-    * Initialize the Form service
-    *
-    */
-    public void init(  )
-    {
-
-    }
-
-    /**
-     * Returns the instance of the singleton
-     *
-     * @return The instance of the singleton
+     * Duplicates configurations of forms, directories and/or workflows
+     * @param directoryToCopy the directory to copy
+     * @param copyOfDirectory the copy of the directory
+     * @param formToCopy the form to copy
+     * @param copyOfForm the copy of the form
+     * @param workflowToCopy the workflow to copy
+     * @param copyOfWorkflow the copy of the workflow
      */
-    public static WizardService getInstance(  )
-    {
-        if ( _singleton == null )
-        {
-            _singleton = new WizardService(  );
-        }
-
-        return _singleton;
-    }
-
-
+    void doDuplicate( Form formToCopy, Form copyOfForm, Directory directoryToCopy, Directory copyOfDirectory,
+            Workflow workflowToCopy, Workflow copyOfWorkflow );
 }
