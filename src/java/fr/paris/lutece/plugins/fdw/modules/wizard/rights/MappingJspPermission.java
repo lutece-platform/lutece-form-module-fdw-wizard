@@ -31,24 +31,33 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.fdw.modules.wizard.service;
+package fr.paris.lutece.plugins.fdw.modules.wizard.rights;
 
-import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
+import fr.paris.lutece.plugins.form.service.FormResourceIdService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
-/**
- * class FormPlugin
- */
-public class WizardPlugin extends PluginDefaultImplementation
+public class MappingJspPermission
 {
-    public static final String PLUGIN_NAME = "fdw-wizard";
+    //CONSTANTS
+    public static final String PERMISSION_MODIFY = "MODIFY";
+    public static final String KEY_ID_RESOURCE_FORM = "FORM_FORM_TYPE";
+    public static final String KEY_ID_RESOURCE_DIRECTORY = "DIRECTORY_DIRECTORY_TYPE";
+    public static final String KEY_ID_RESOURCE_WORKFLOW = "WORKFLOW_WORKFLOW_TYPE";
+    public static final Map<String, PermissionResourceType> MAPPING_JSP_PERMISSIONS;
 
-    /**
-     * Initialize the plugin form
-     */
-    public void init(  )
+    static
     {
-        // Initialize the Poll service
-        WizardService.getInstance(  ).init(  );
+        MAPPING_JSP_PERMISSIONS = new HashMap<String, PermissionResourceType>(  );
+
+        //Modify Form
+        MAPPING_JSP_PERMISSIONS.put( "ModifyForm.jsp",
+            new PermissionResourceType( KEY_ID_RESOURCE_FORM, FormResourceIdService.PERMISSION_MODIFY ) );
+
+        //Modify Directory
+        MAPPING_JSP_PERMISSIONS.put( "ModifyDirectory.jsp",
+            new PermissionResourceType( KEY_ID_RESOURCE_DIRECTORY, FormResourceIdService.PERMISSION_MODIFY ) );
     }
 }

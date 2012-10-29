@@ -31,24 +31,66 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.fdw.modules.wizard.service;
-
-import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
+package fr.paris.lutece.plugins.fdw.modules.wizard.rights;
 
 
 /**
- * class FormPlugin
+ * Class PermissionResourceType
+ *
  */
-public class WizardPlugin extends PluginDefaultImplementation
+public class PermissionResourceType
 {
-    public static final String PLUGIN_NAME = "fdw-wizard";
+    /**
+     * permission's key
+     */
+    private String _permission;
 
     /**
-     * Initialize the plugin form
+     * resource's key
      */
-    public void init(  )
+    private String _resourceType;
+
+    /**
+     * Creates a new PermissionTypeResource.java object.
+     * @param resourceType the resource type
+     * @param permission the permission
+     */
+    public PermissionResourceType( String resourceType, String permission )
     {
-        // Initialize the Poll service
-        WizardService.getInstance(  ).init(  );
+        super(  );
+        this._resourceType = resourceType;
+        this._permission = permission;
+    }
+
+    /**
+     * @param permission the permission to set
+     */
+    public void setPermission( String permission )
+    {
+        this._permission = permission;
+    }
+
+    /**
+     * @return the permission
+     */
+    public String getPermission(  )
+    {
+        return _permission;
+    }
+
+    /**
+     * @param resourceType the resourceType to set
+     */
+    public void setResourceType( String resourceType )
+    {
+        this._resourceType = resourceType;
+    }
+
+    /**
+     * @return the resourceType
+     */
+    public String getResourceType(  )
+    {
+        return _resourceType;
     }
 }

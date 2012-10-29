@@ -8,6 +8,7 @@ import fr.paris.lutece.plugins.directory.business.DirectoryFilter;
 import fr.paris.lutece.plugins.directory.business.DirectoryHome;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
 import fr.paris.lutece.plugins.fdw.modules.wizard.business.FormWithDirectory;
+import fr.paris.lutece.plugins.fdw.modules.wizard.rights.Rights;
 import fr.paris.lutece.plugins.fdw.modules.wizard.service.DuplicationManager;
 import fr.paris.lutece.plugins.form.business.Form;
 import fr.paris.lutece.plugins.form.business.FormFilter;
@@ -68,7 +69,6 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_DUPLICATE = "duplicate";
     private static final String PARAMETER_NEXT = "next";
     private static final String PARAMETER_PREVIOUS = "previous";
-    private static final String PARAMETER_CANCEL = "cancel";
     private static final String PARAMETER_FROM_CHOICE = "from_choice";
     private static final String PARAMETER_DIRECTORY_TITLE = "directory_title";
     private static final String PARAMETER_WORKFLOW_TITLE = "workflow_title";
@@ -101,31 +101,31 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String MACRO_COLUMN_ACTIONS_WORKFLOW = "columnActionsWorkflow";
 
     //templates
-    private static final String TEMPLATE_MANAGE_WIZARD = "admin/plugins/fdw-wizard/manage_wizard.html";
-    private static final String TEMPLATE_DUPLICATE_WORKFLOW = "admin/plugins/fdw-wizard/duplicate_workflow.html";
-    private static final String TEMPLATE_DUPLICATE_WORKFLOW_SUCCESS = "admin/plugins/fdw-wizard/duplicate_workflow_success.html";
-    private static final String TEMPLATE_DUPLICATE_DIRECTORY_SIMPLE = "admin/plugins/fdw-wizard/duplicate_directory_simple.html";
-    private static final String TEMPLATE_DUPLICATE_DIRECTORY_SIMPLE_SUCCESS = "admin/plugins/fdw-wizard/duplicate_directory_simple_success.html";
-    private static final String TEMPLATE_DUPLICATE_DIRECTORY_CHOICE = "admin/plugins/fdw-wizard/duplicate_directory_choice.html";
-    private static final String TEMPLATE_DUPLICATE_DIRECTORY_WITH_WORKFLOW = "admin/plugins/fdw-wizard/duplicate_directory_with_workflow.html";
-    private static final String TEMPLATE_DUPLICATE_FORM_SIMPLE = "admin/plugins/fdw-wizard/duplicate_form_simple.html";
-    private static final String TEMPLATE_DUPLICATE_FORM_SUCCESS = "admin/plugins/fdw-wizard/duplicate_form_success.html";
-    private static final String TEMPLATE_DUPLICATE_FORM_CHOICE = "admin/plugins/fdw-wizard/duplicate_form_choice.html";
-    private static final String TEMPLATE_DUPLICATE_FORM_WITH_DIRECTORY = "admin/plugins/fdw-wizard/duplicate_form_with_directory.html";
-    private static final String TEMPLATE_DUPLICATE_FORM_WITH_DIRECTORY_AND_WORKFLOW = "admin/plugins/fdw-wizard/duplicate_form_with_directory_and_workflow.html";
+    private static final String TEMPLATE_MANAGE_WIZARD = "admin/plugins/fdw/modules/wizard/manage_wizard.html";
+    private static final String TEMPLATE_DUPLICATE_WORKFLOW = "admin/plugins/fdw/modules/wizard/duplicate_workflow.html";
+    private static final String TEMPLATE_DUPLICATE_WORKFLOW_SUCCESS = "admin/plugins/fdw/modules/wizard/duplicate_workflow_success.html";
+    private static final String TEMPLATE_DUPLICATE_DIRECTORY_SIMPLE = "admin/plugins/fdw/modules/wizard/duplicate_directory_simple.html";
+    private static final String TEMPLATE_DUPLICATE_DIRECTORY_SIMPLE_SUCCESS = "admin/plugins/fdw/modules/wizard/duplicate_directory_simple_success.html";
+    private static final String TEMPLATE_DUPLICATE_DIRECTORY_CHOICE = "admin/plugins/fdw/modules/wizard/duplicate_directory_choice.html";
+    private static final String TEMPLATE_DUPLICATE_DIRECTORY_WITH_WORKFLOW = "admin/plugins/fdw/modules/wizard/duplicate_directory_with_workflow.html";
+    private static final String TEMPLATE_DUPLICATE_FORM_SIMPLE = "admin/plugins/fdw/modules/wizard/duplicate_form_simple.html";
+    private static final String TEMPLATE_DUPLICATE_FORM_SUCCESS = "admin/plugins/fdw/modules/wizard/duplicate_form_success.html";
+    private static final String TEMPLATE_DUPLICATE_FORM_CHOICE = "admin/plugins/fdw/modules/wizard/duplicate_form_choice.html";
+    private static final String TEMPLATE_DUPLICATE_FORM_WITH_DIRECTORY = "admin/plugins/fdw/modules/wizard/duplicate_form_with_directory.html";
+    private static final String TEMPLATE_DUPLICATE_FORM_WITH_DIRECTORY_AND_WORKFLOW = "admin/plugins/fdw/modules/wizard/duplicate_form_with_directory_and_workflow.html";
 
-    private static final String JSP_MANAGE_WIZARD = "jsp/admin/plugins/fdw-wizard/ManageWizard.jsp";
-    private static final String JSP_DUPLICATION_SUCCESS_WORKFLOW = "jsp/admin/plugins/fdw-wizard/DuplicateWorkflowSuccess.jsp";
-    private static final String JSP_DUPLICATION_SUCCESS_DIRECTORY_SIMPLE = "jsp/admin/plugins/fdw-wizard/DuplicateDirectorySimpleSuccess.jsp";
-    private static final String JSP_DUPLICATION_SUCCESS_DIRECTORY_WITH_WORKFLOW = "jsp/admin/plugins/fdw-wizard/DuplicateDirectoryWithWorkflowSuccess.jsp";
-    private static final String JSP_DUPLICATE_DIRECTORY_SIMPLE = "jsp/admin/plugins/fdw-wizard/DuplicateDirectorySimple.jsp";
-    private static final String JSP_DUPLICATE_DIRECTORY_WITH_WORKFLOW = "jsp/admin/plugins/fdw-wizard/DuplicateDirectoryWithWorkflow.jsp";
-    private static final String JSP_DUPLICATE_DIRECTORY_CHOICE = "jsp/admin/plugins/fdw-wizard/DuplicateDirectoryChoice.jsp";
-    private static final String JSP_DUPLICATION_SUCCESS_FORM = "jsp/admin/plugins/fdw-wizard/DuplicateFormSuccess.jsp";
-    private static final String JSP_DUPLICATE_FORM_SIMPLE = "jsp/admin/plugins/fdw-wizard/DuplicateFormSimple.jsp";
-    private static final String JSP_DUPLICATE_FORM_WITH_DIRECTORY = "jsp/admin/plugins/fdw-wizard/DuplicateFormWithDirectory.jsp";
-    private static final String JSP_DUPLICATE_FORM_WITH_DIRECTORY_AND_WORKFLOW = "jsp/admin/plugins/fdw-wizard/DuplicateFormWithDirectoryAndWorkflow.jsp";
-    private static final String JSP_DUPLICATE_FORM_CHOICE = "jsp/admin/plugins/fdw-wizard/DuplicateFormChoice.jsp";
+    private static final String JSP_MANAGE_WIZARD = "jsp/admin/plugins/fdw/modules/wizard/ManageWizard.jsp";
+    private static final String JSP_DUPLICATION_SUCCESS_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateWorkflowSuccess.jsp";
+    private static final String JSP_DUPLICATION_SUCCESS_DIRECTORY_SIMPLE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectorySimpleSuccess.jsp";
+    private static final String JSP_DUPLICATION_SUCCESS_DIRECTORY_WITH_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectoryWithWorkflowSuccess.jsp";
+    private static final String JSP_DUPLICATE_DIRECTORY_SIMPLE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectorySimple.jsp";
+    private static final String JSP_DUPLICATE_DIRECTORY_WITH_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectoryWithWorkflow.jsp";
+    private static final String JSP_DUPLICATE_DIRECTORY_CHOICE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectoryChoice.jsp";
+    private static final String JSP_DUPLICATION_SUCCESS_FORM = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormSuccess.jsp";
+    private static final String JSP_DUPLICATE_FORM_SIMPLE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormSimple.jsp";
+    private static final String JSP_DUPLICATE_FORM_WITH_DIRECTORY = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormWithDirectory.jsp";
+    private static final String JSP_DUPLICATE_FORM_WITH_DIRECTORY_AND_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormWithDirectoryAndWorkflow.jsp";
+    private static final String JSP_DUPLICATE_FORM_CHOICE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormChoice.jsp";
 
     private IWorkflowService _workflowService = SpringContextService.getBean( WorkflowService.BEAN_SERVICE );
     private IActionService _actionService = SpringContextService.getBean( ActionService.BEAN_SERVICE );
@@ -199,6 +199,10 @@ public class WizardJspBean extends PluginAdminPageJspBean
 
         dataTableForm.filterSortAndPaginate( request, listFormWithDirectory );
         model.put( MARK_DATA_TABLE_FORM, dataTableForm );
+
+        Rights rights = new Rights( );
+        rights.init( request );
+        model.put( "rights", rights );
 
         HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_MANAGE_WIZARD, getLocale( ), model );
 

@@ -1,0 +1,28 @@
+<div class="container">  
+	<fieldset>
+		<legend>
+			#i18n{module.fdw.wizard.duplication.form.title_with_directory_and_workflow}
+		</legend>
+	</fieldset>
+	<form method="post" action="jsp/admin/plugins/fdw/modules/wizard/DoDuplicateForm.jsp?id_form=${form.idForm}" style="margin: 0px">     
+		#i18n{module.fdw.wizard.duplication.form.input_title} : <input type="text" name="form_title">
+		<br /><br />
+		#i18n{module.fdw.wizard.duplication.form.input_directory_title} : <input type="text" name="directory_title">
+		<br /><br />
+		#i18n{module.fdw.wizard.duplication.form.input_workflow_title} : <input type="text" name="workflow_title">
+		<br /><br />
+		<button type="submit" class="btn btn-primary" name="duplicate" title="#i18n{module.fdw.wizard.duplication.button_duplicate}" value="#i18n{module.fdw.wizard.duplication.button_duplicate}" >
+			#i18n{module.fdw.wizard.duplication.button_duplicate}
+		</button>
+		<#if fromChoice?? >
+			<button type="submit" class="btn btn-primary" name="previous" title="#i18n{module.fdw.wizard.duplication.button_previous}" value="#i18n{module.fdw.wizard.duplication.button_previous}" >
+				#i18n{module.fdw.wizard.duplication.button_previous}
+			</button>
+		</#if>
+		<button type="submit" class="btn btn-primary" name="cancel" title="#i18n{module.fdw.wizard.duplication.button_cancel}" value="#i18n{module.fdw.wizard.duplication.button_cancel}" >
+			#i18n{module.fdw.wizard.duplication.button_cancel}
+		</button>
+		<input type="hidden" name="copyMode" value="formWithDirectoryAndWorkflow" />
+	</form>
+	<br /><br />
+</div>
