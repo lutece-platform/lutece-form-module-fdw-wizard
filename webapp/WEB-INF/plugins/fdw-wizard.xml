@@ -12,13 +12,19 @@
     <description>module.fdw.wizard.plugin.description</description>
     <provider>module.fdw.wizard.plugin.provider</provider>
     <provider-url>http://lutece.paris.fr</provider-url>
-    <icon-url>images/admin/skin/plugins/fdw-wizard/fdw-wizard.png</icon-url>
+    <icon-url>images/admin/skin/plugins/fdw/modules/wizard/fdw-wizard.png</icon-url>
     <copyright>Copyright 2001-2012 Mairie de Paris</copyright>
     <core-version-dependency>
         <min-core-version>4.0.0</min-core-version>
         <max-core-version/>
     </core-version-dependency>
     <db-pool-required>1</db-pool-required>
+
+    <!-- Specific plugin CSS stylesheet -->
+    <css-stylesheets>
+        <css-stylesheets-scope>xpage</css-stylesheets-scope>
+        <css-stylesheet>jscalendar/calendar-lutece.css</css-stylesheet>
+    </css-stylesheets>
 
     <!--Administration interface parameters -->
     <admin-features>
@@ -27,8 +33,8 @@
             <feature-title>module.fdw.wizard.adminFeature.fdw-wizard_management.name</feature-title>
             <feature-description>module.fdw.wizard.adminFeature.fdw-wizard_management.description</feature-description>
             <feature-level>2</feature-level>
-            <feature-url>jsp/admin/plugins/fdw-wizard/ManageWizard.jsp</feature-url>
-            <feature-icon-url>images/admin/skin/plugins/fdw-wizard/fdw-wizard.png</feature-icon-url>
+            <feature-url>jsp/admin/plugins/fdw/modules/wizard/ManageWizard.jsp</feature-url>
+            <feature-icon-url>images/admin/skin/plugins/fdw/modules/wizard/fdw-wizard.png</feature-icon-url>
             <feature-documentation-url>jsp/admin/documentation/AdminDocumentation.jsp?doc=admin-fdw-wizard</feature-documentation-url>
         </admin-feature>
     </admin-features>
