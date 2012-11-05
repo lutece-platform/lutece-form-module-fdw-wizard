@@ -41,17 +41,17 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 /**
  * Manages duplication of configurations from other plugins
- * 
+ *
  */
 public class DuplicationManager
 {
     public static void doDuplicate( Form formToCopy, Form copyOfForm, Directory directoryToCopy,
-            Directory copyOfDirectory, Workflow workflowToCopy, Workflow copyOfWorkflow )
+        Directory copyOfDirectory, Workflow workflowToCopy, Workflow copyOfWorkflow )
     {
-        for ( IDuplicationService duplicationService : SpringContextService.getBeansOfType( IDuplicationService.class) )
+        for ( IDuplicationService duplicationService : SpringContextService.getBeansOfType( IDuplicationService.class ) )
         {
             duplicationService.doDuplicate( formToCopy, copyOfForm, directoryToCopy, copyOfDirectory, workflowToCopy,
-                    copyOfWorkflow );
+                copyOfWorkflow );
         }
     }
 }

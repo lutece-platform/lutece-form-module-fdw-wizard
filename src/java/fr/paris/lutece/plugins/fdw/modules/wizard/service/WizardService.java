@@ -34,24 +34,21 @@
 package fr.paris.lutece.plugins.fdw.modules.wizard.service;
 
 
-
 /**
- * 
+ *
  * WizardService
- * 
+ *
  */
 public class WizardService
 {
-
     private static WizardService _singleton;
 
     /**
-    * Initialize the Form service
-    *
-    */
+     * Initialize the service
+     *
+     */
     public void init(  )
     {
-
     }
 
     /**
@@ -68,6 +65,4 @@ public class WizardService
 
         return _singleton;
     }
-
-
 }

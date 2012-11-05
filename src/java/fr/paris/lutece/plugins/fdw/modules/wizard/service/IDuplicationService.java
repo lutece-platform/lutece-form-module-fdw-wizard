@@ -40,7 +40,7 @@ import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
 
 /**
  * Interface for duplication service
- * 
+ *
  */
 public interface IDuplicationService
 {
@@ -54,5 +54,5 @@ public interface IDuplicationService
      * @param copyOfWorkflow the copy of the workflow
      */
     void doDuplicate( Form formToCopy, Form copyOfForm, Directory directoryToCopy, Directory copyOfDirectory,
-            Workflow workflowToCopy, Workflow copyOfWorkflow );
+        Workflow workflowToCopy, Workflow copyOfWorkflow );
 }

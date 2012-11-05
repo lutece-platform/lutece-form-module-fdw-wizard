@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Class Rights
- * 
+ *
  */
 public class Rights
 {

@@ -38,7 +38,7 @@ import fr.paris.lutece.plugins.form.business.Form;
 
 
 /**
- * 
+ *
  *
  */
 public class FormWithDirectory
@@ -49,7 +49,7 @@ public class FormWithDirectory
     /**
      * @return the form
      */
-    public Form getForm( )
+    public Form getForm(  )
     {
         return _form;
     }
@@ -65,7 +65,7 @@ public class FormWithDirectory
     /**
      * @return the directory
      */
-    public Directory getDirectory( )
+    public Directory getDirectory(  )
     {
         return _directory;
     }
@@ -77,5 +77,4 @@ public class FormWithDirectory
     {
         this._directory = directory;
     }
-
 }

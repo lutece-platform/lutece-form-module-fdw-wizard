@@ -37,14 +37,14 @@ import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
 
 
 /**
- * class FormPlugin
+ * class WizardPlugin
  */
 public class WizardPlugin extends PluginDefaultImplementation
 {
     public static final String PLUGIN_NAME = "fdw-wizard";
 
     /**
-     * Initialize the plugin form
+     * Initialize the plugin
      */
     public void init(  )
     {
