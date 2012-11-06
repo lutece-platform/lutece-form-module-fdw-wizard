@@ -1,0 +1,13 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
+	
+    <!-- Services -->
+    <bean id="fdw-wizard.wizardService" class="fr.paris.lutece.plugins.fdw.modules.wizard.service.WizardService" >
+    	<property name="workflowService" ref="workflow.workflowService" />
+    	<property name="actionService" ref="workflow.actionService" />
+    	<property name="stateService" ref="workflow.stateService" />
+    	<property name="taskService" ref="workflow.taskService" />
+    </bean>
+
+</beans>

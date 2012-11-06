@@ -33,9 +33,8 @@
  */
 package fr.paris.lutece.plugins.fdw.modules.wizard.service;
 
-import fr.paris.lutece.plugins.directory.business.Directory;
-import fr.paris.lutece.plugins.form.business.Form;
-import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
+import fr.paris.lutece.plugins.fdw.modules.wizard.business.DuplicationContext;
+import fr.paris.lutece.plugins.fdw.modules.wizard.exception.DuplicationException;
 
 
 /**
@@ -46,13 +45,8 @@ public interface IDuplicationService
 {
     /**
      * Duplicates configurations of forms, directories and/or workflows
-     * @param directoryToCopy the directory to copy
-     * @param copyOfDirectory the copy of the directory
-     * @param formToCopy the form to copy
-     * @param copyOfForm the copy of the form
-     * @param workflowToCopy the workflow to copy
-     * @param copyOfWorkflow the copy of the workflow
+     * @param context the duplication context
+     * @throws DuplicationException if an error occurs during duplication
      */
-    void doDuplicate( Form formToCopy, Form copyOfForm, Directory directoryToCopy, Directory copyOfDirectory,
-        Workflow workflowToCopy, Workflow copyOfWorkflow );
+    void doDuplicate( DuplicationContext context ) throws DuplicationException;
 }

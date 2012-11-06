@@ -1,5 +1,35 @@
-/**
+/*
+ * Copyright (c) 2002-2012, Mairie de Paris
+ * All rights reserved.
  *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
  */
 package fr.paris.lutece.plugins.fdw.modules.wizard.web;
 
@@ -7,9 +37,12 @@ import fr.paris.lutece.plugins.directory.business.Directory;
 import fr.paris.lutece.plugins.directory.business.DirectoryFilter;
 import fr.paris.lutece.plugins.directory.business.DirectoryHome;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
+import fr.paris.lutece.plugins.fdw.modules.wizard.business.DuplicationContext;
 import fr.paris.lutece.plugins.fdw.modules.wizard.business.FormWithDirectory;
+import fr.paris.lutece.plugins.fdw.modules.wizard.exception.DuplicationException;
 import fr.paris.lutece.plugins.fdw.modules.wizard.rights.Rights;
 import fr.paris.lutece.plugins.fdw.modules.wizard.service.DuplicationManager;
+import fr.paris.lutece.plugins.fdw.modules.wizard.service.WizardService;
 import fr.paris.lutece.plugins.form.business.Form;
 import fr.paris.lutece.plugins.form.business.FormFilter;
 import fr.paris.lutece.plugins.form.business.FormHome;
@@ -17,18 +50,12 @@ import fr.paris.lutece.plugins.form.modules.exportdirectory.business.FormConfigu
 import fr.paris.lutece.plugins.form.modules.exportdirectory.business.FormConfigurationHome;
 import fr.paris.lutece.plugins.form.utils.FormUtils;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
-import fr.paris.lutece.plugins.workflowcore.business.action.Action;
-import fr.paris.lutece.plugins.workflowcore.business.action.ActionFilter;
-import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
-import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
 import fr.paris.lutece.plugins.workflowcore.business.workflow.WorkflowFilter;
 import fr.paris.lutece.plugins.workflowcore.service.action.ActionService;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
-import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
-import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
 import fr.paris.lutece.plugins.workflowcore.service.task.TaskService;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
@@ -41,10 +68,8 @@ import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.util.datatable.DataTableManager;
 import fr.paris.lutece.util.html.HtmlTemplate;
-import fr.paris.lutece.util.method.MethodUtil;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.apache.commons.collections.iterators.EntrySetMapIterator;
 import org.apache.commons.lang.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -58,11 +83,12 @@ import javax.servlet.http.HttpServletRequest;
 
 
 /**
- *
+ * WizardJspBean
  *
  */
 public class WizardJspBean extends PluginAdminPageJspBean
 {
+    //parameters
     private static final String PARAMETER_ID_WORKFLOW = "id_workflow";
     private static final String PARAMETER_ID_DIRECTORY = "id_directory";
     private static final String PARAMETER_ID_FORM = "id_form";
@@ -80,11 +106,15 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String VALUE_FORM_CHOICE_SIMPLE = "DuplicationSimple";
     private static final String VALUE_FORM_CHOICE_WITH_DIRECTORY = "DuplicationWithDirectory";
     private static final String VALUE_FORM_CHOICE_WITH_DIRECTORY_AND_WORKFLOW = "DuplicationWithDirectoryAndWorkflow";
+
+    //copy modes
     private static final String COPY_MODE_DIRECTORY_ONLY = "directoryOnly";
     private static final String COPY_MODE_DIRECTORY_WITH_WORKFLOW = "directoryWithWorkflow";
     private static final String COPY_MODE_FORM_ONLY = "formOnly";
     private static final String COPY_MODE_FORM_WITH_DIRECTORY = "formWithDirectory";
     private static final String COPY_MODE_FORM_WITH_DIRECTORY_AND_WORKFLOW = "formWithDirectoryAndWorkflow";
+
+    // marks
     private static final String MARK_DATA_TABLE_DIRECTORY = "dataTableDirectory";
     private static final String MARK_DATA_TABLE_FORM = "dataTableForm";
     private static final String MARK_DATA_TABLE_WORKFLOW = "dataTableWorkflow";
@@ -94,6 +124,8 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String MARK_FORM_WITH_DIRECTORY = "formWithDirectory";
     private static final String MARK_FROM_CHOICE = "fromChoice";
     private static final String MARK_COPY_MODE = "copyMode";
+
+    //macro column names
     private static final String MACRO_COLUMN_ACTIONS_DIRECTORY = "columnActionsDirectory";
     private static final String MACRO_COLUMN_ACTIONS_FORM = "columnActionsForm";
     private static final String MACRO_COLUMN_ACTIONS_WORKFLOW = "columnActionsWorkflow";
@@ -111,6 +143,8 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String TEMPLATE_DUPLICATE_FORM_CHOICE = "admin/plugins/fdw/modules/wizard/duplicate_form_choice.html";
     private static final String TEMPLATE_DUPLICATE_FORM_WITH_DIRECTORY = "admin/plugins/fdw/modules/wizard/duplicate_form_with_directory.html";
     private static final String TEMPLATE_DUPLICATE_FORM_WITH_DIRECTORY_AND_WORKFLOW = "admin/plugins/fdw/modules/wizard/duplicate_form_with_directory_and_workflow.html";
+
+    //jsp
     private static final String JSP_MANAGE_WIZARD = "jsp/admin/plugins/fdw/modules/wizard/ManageWizard.jsp";
     private static final String JSP_DUPLICATION_SUCCESS_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateWorkflowSuccess.jsp";
     private static final String JSP_DUPLICATION_SUCCESS_DIRECTORY_SIMPLE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectorySimpleSuccess.jsp";
@@ -123,10 +157,13 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String JSP_DUPLICATE_FORM_WITH_DIRECTORY = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormWithDirectory.jsp";
     private static final String JSP_DUPLICATE_FORM_WITH_DIRECTORY_AND_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormWithDirectoryAndWorkflow.jsp";
     private static final String JSP_DUPLICATE_FORM_CHOICE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormChoice.jsp";
+
+    //services
     private IWorkflowService _workflowService = SpringContextService.getBean( WorkflowService.BEAN_SERVICE );
     private IActionService _actionService = SpringContextService.getBean( ActionService.BEAN_SERVICE );
     private IStateService _stateService = SpringContextService.getBean( StateService.BEAN_SERVICE );
     private ITaskService _taskService = SpringContextService.getBean( TaskService.BEAN_SERVICE );
+    private WizardService _wizardService = SpringContextService.getBean( WizardService.BEAN_SERVICE );
 
     /**
      * Return management wizard
@@ -243,12 +280,10 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * @param request the request
      * @return The URL of the duplication success page
      * @throws AccessDeniedException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws NoSuchMethodException
+     * @throws DuplicationException
      */
     public String doDuplicateWorkflow( HttpServletRequest request )
-        throws AccessDeniedException, NoSuchMethodException, IllegalAccessException, InvocationTargetException
+        throws AccessDeniedException, DuplicationException
     {
         String strIdWorkflow = request.getParameter( PARAMETER_ID_WORKFLOW );
         int nIdWorkflow = WorkflowUtils.convertStringToInt( strIdWorkflow );
@@ -269,7 +304,15 @@ public class WizardJspBean extends PluginAdminPageJspBean
         {
             // simple copy
             String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
-            doCopyWorkflow( workflow, strWorkflowCopyTitle );
+            int nIdWorkflowCopy = _wizardService.doCopyWorkflow( workflow, strWorkflowCopyTitle, this.getLocale(  ) );
+
+            DuplicationContext context = new DuplicationContext(  );
+            context.setLocale( this.getLocale(  ) );
+            context.setPlugin( getPlugin(  ) );
+            context.setWorkflowDuplication( true );
+            context.setWorkflowToCopy( _wizardService.getWorkflow( nIdWorkflow ) );
+            context.setWorkflowCopy( _wizardService.getWorkflow( nIdWorkflowCopy ) );
+            DuplicationManager.doDuplicate( context );
 
             url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATION_SUCCESS_WORKFLOW );
             url.addParameter( PARAMETER_ID_WORKFLOW, nIdWorkflow );
@@ -357,12 +400,10 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * @param request the request
      * @return The URL of the duplication success page
      * @throws AccessDeniedException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws NoSuchMethodException
+     * @throws DuplicationException
      */
     public String doDuplicateDirectory( HttpServletRequest request )
-        throws AccessDeniedException, NoSuchMethodException, IllegalAccessException, InvocationTargetException
+        throws AccessDeniedException, DuplicationException
     {
         String strIdDirectory = request.getParameter( PARAMETER_ID_DIRECTORY );
         int nIdDirectory = DirectoryUtils.convertStringToInt( strIdDirectory );
@@ -389,22 +430,35 @@ public class WizardJspBean extends PluginAdminPageJspBean
                 // simple copy
                 directory.setIdWorkflow( DirectoryUtils.CONSTANT_ID_NULL );
 
-                int nIdDirectoryCopy = doCopyDirectory( directory, strDirectoryCopyTitle );
+                int nIdDirectoryCopy = _wizardService.doCopyDirectory( directory, strDirectoryCopyTitle, getPlugin(  ) );
 
-                doExtraDuplication( DirectoryUtils.CONSTANT_ID_NULL, DirectoryUtils.CONSTANT_ID_NULL, nIdDirectory,
-                    nIdDirectoryCopy, DirectoryUtils.CONSTANT_ID_NULL, DirectoryUtils.CONSTANT_ID_NULL );
+                DuplicationContext context = new DuplicationContext(  );
+                context.setLocale( this.getLocale(  ) );
+                context.setPlugin( getPlugin(  ) );
+                context.setDirectoryDuplication( true );
+                context.setDirectoryToCopy( _wizardService.getDirectory( nIdDirectory, getPlugin(  ) ) );
+                context.setDirectoryCopy( _wizardService.getDirectory( nIdDirectoryCopy, getPlugin(  ) ) );
+                DuplicationManager.doDuplicate( context );
             }
             else if ( COPY_MODE_DIRECTORY_WITH_WORKFLOW.equals( strCopyMode ) )
             {
                 // copy with workflow
                 int nIdWorkflowToCopy = directory.getIdWorkflow(  );
                 String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
-                int nIdDirectoryCopy = doCopyDirectoryWithWorkflow( directory, strDirectoryCopyTitle,
-                        strWorkflowCopyTitle );
+                int nIdDirectoryCopy = _wizardService.doCopyDirectoryWithWorkflow( directory, strDirectoryCopyTitle,
+                        strWorkflowCopyTitle, getPlugin(  ), this.getLocale(  ) );
                 int nIdWorkflowCopy = directory.getIdWorkflow(  );
 
-                doExtraDuplication( DirectoryUtils.CONSTANT_ID_NULL, DirectoryUtils.CONSTANT_ID_NULL, nIdDirectory,
-                    nIdDirectoryCopy, nIdWorkflowToCopy, nIdWorkflowCopy );
+                DuplicationContext context = new DuplicationContext(  );
+                context.setLocale( this.getLocale(  ) );
+                context.setPlugin( getPlugin(  ) );
+                context.setDirectoryDuplication( true );
+                context.setWorkflowDuplication( true );
+                context.setDirectoryToCopy( _wizardService.getDirectory( nIdDirectory, getPlugin(  ) ) );
+                context.setDirectoryCopy( _wizardService.getDirectory( nIdDirectoryCopy, getPlugin(  ) ) );
+                context.setWorkflowToCopy( _wizardService.getWorkflow( nIdWorkflowToCopy ) );
+                context.setWorkflowCopy( _wizardService.getWorkflow( nIdWorkflowCopy ) );
+                DuplicationManager.doDuplicate( context );
             }
 
             // success
@@ -644,9 +698,11 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      * @throws NoSuchMethodException
+     * @throws DuplicationException
      */
     public String doDuplicateForm( HttpServletRequest request )
-        throws AccessDeniedException, NoSuchMethodException, IllegalAccessException, InvocationTargetException
+        throws AccessDeniedException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
+            DuplicationException
     {
         String strIdForm = request.getParameter( PARAMETER_ID_FORM );
         int nIdForm = FormUtils.convertStringToInt( strIdForm );
@@ -671,20 +727,50 @@ public class WizardJspBean extends PluginAdminPageJspBean
             if ( COPY_MODE_FORM_ONLY.equals( strCopyMode ) )
             {
                 // simple copy
-                doCopyForm( form, strFormCopyTitle );
+                int nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin(  ) );
+
+                DuplicationContext context = new DuplicationContext(  );
+                context.setLocale( this.getLocale(  ) );
+                context.setPlugin( getPlugin(  ) );
+                context.setFormDuplication( true );
+                context.setFormToCopy( _wizardService.getForm( nIdForm, getPlugin(  ) ) );
+                context.setFormCopy( _wizardService.getForm( nIdFormCopy, getPlugin(  ) ) );
+                DuplicationManager.doDuplicate( context );
             }
             else if ( COPY_MODE_FORM_WITH_DIRECTORY.equals( strCopyMode ) )
             {
                 String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
 
-                doCopyFormWithDirectory( form, strFormCopyTitle, strDirectoryCopyTitle );
+                int nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin(  ) );
+
+                DuplicationContext context = new DuplicationContext(  );
+                context.setLocale( this.getLocale(  ) );
+                context.setPlugin( getPlugin(  ) );
+                context.setFormDuplication( true );
+                context.setDirectoryDuplication( true );
+                context.setDirectoryCopyName( strDirectoryCopyTitle );
+                context.setFormToCopy( _wizardService.getForm( nIdForm, getPlugin(  ) ) );
+                context.setFormCopy( _wizardService.getForm( nIdFormCopy, getPlugin(  ) ) );
+                DuplicationManager.doDuplicate( context );
             }
             else if ( COPY_MODE_FORM_WITH_DIRECTORY_AND_WORKFLOW.equals( strCopyMode ) )
             {
                 String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
                 String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
 
-                doCopyFormWithDirectoryAndWorkflow( form, strFormCopyTitle, strDirectoryCopyTitle, strWorkflowCopyTitle );
+                int nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin(  ) );
+
+                DuplicationContext context = new DuplicationContext(  );
+                context.setLocale( this.getLocale(  ) );
+                context.setPlugin( getPlugin(  ) );
+                context.setFormDuplication( true );
+                context.setDirectoryDuplication( true );
+                context.setWorkflowDuplication( true );
+                context.setDirectoryCopyName( strDirectoryCopyTitle );
+                context.setWorkflowCopyName( strWorkflowCopyTitle );
+                context.setFormToCopy( _wizardService.getForm( nIdForm, getPlugin(  ) ) );
+                context.setFormCopy( _wizardService.getForm( nIdFormCopy, getPlugin(  ) ) );
+                DuplicationManager.doDuplicate( context );
             }
 
             // success
@@ -908,297 +994,4 @@ public class WizardJspBean extends PluginAdminPageJspBean
         return getAdminPage( templateList.getHtml(  ) );
     }
 
-    /**
-     * Copy a given workflow
-     * @param workflowToCopy the workflow to copy
-     * @param copyName the name of the copy
-     * @return the id of the copy
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws NoSuchMethodException
-     */
-    private int doCopyWorkflow( Workflow workflowToCopy, String copyName )
-        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-    {
-        int nIdWorkflow = workflowToCopy.getId(  );
-        Map<Integer, Integer> mapIdStates = new HashMap<Integer, Integer>(  );
-        Map<Integer, Integer> mapIdActions = new HashMap<Integer, Integer>(  );
-
-        workflowToCopy.setName( copyName );
-        _workflowService.create( workflowToCopy );
-
-        //get all the states of the workflow to copy
-        List<State> listStatesOfWorkflow = (List<State>) _workflowService.getAllStateByWorkflow( nIdWorkflow );
-
-        for ( State state : listStatesOfWorkflow )
-        {
-            state.setWorkflow( workflowToCopy );
-
-            //get the maximum order number in this workflow and set max+1
-            int nMaximumOrder = _stateService.findMaximumOrderByWorkflowId( state.getWorkflow(  ).getId(  ) );
-            state.setOrder( nMaximumOrder + 1 );
-
-            // Save state to copy id
-            Integer nOldIdState = state.getId(  );
-
-            // Create new state (this action will change state id with the new idState)
-            _stateService.create( state );
-
-            mapIdStates.put( nOldIdState, state.getId(  ) );
-        }
-
-        //get all the actions of the workflow to copy
-        ActionFilter actionFilter = new ActionFilter(  );
-        actionFilter.setIdWorkflow( nIdWorkflow );
-
-        List<Action> listActionsOfWorkflow = _actionService.getListActionByFilter( actionFilter );
-
-        for ( Action action : listActionsOfWorkflow )
-        {
-            action.setWorkflow( workflowToCopy );
-
-            //get the maximum order number in this workflow and set max+1
-            int nMaximumOrder = _actionService.findMaximumOrderByWorkflowId( action.getWorkflow(  ).getId(  ) );
-            action.setOrder( nMaximumOrder + 1 );
-
-            // Change idState to set the new state
-            action.getStateBefore(  ).setId( mapIdStates.get( action.getStateBefore(  ).getId(  ) ) );
-            action.getStateAfter(  ).setId( mapIdStates.get( action.getStateAfter(  ).getId(  ) ) );
-
-            int nOldIdAction = action.getId(  );
-
-            //get the linked tasks and duplicate them
-            List<ITask> listLinkedTasks = _taskService.getListTaskByIdAction( action.getId(  ), this.getLocale(  ) );
-
-            _actionService.create( action );
-
-            mapIdActions.put( nOldIdAction, action.getId(  ) );
-
-            for ( ITask task : listLinkedTasks )
-            {
-                //for each we change the linked action
-                task.setAction( action );
-
-                //and then we create the new task duplicated
-                this.doCopyTaskWithModifiedParam( task, null );
-            }
-        }
-
-        //get all the linked actions
-        actionFilter = new ActionFilter(  );
-        actionFilter.setIdWorkflow( workflowToCopy.getId(  ) );
-
-        List<Action> listActionsOfNewWorkflow = _actionService.getListActionByFilter( actionFilter );
-
-        for ( Action action : listActionsOfNewWorkflow )
-        {
-            List<Integer> newListIdsLinkedAction = new ArrayList<Integer>(  );
-
-            for ( Integer nIdActionLinked : action.getListIdsLinkedAction(  ) )
-            {
-                newListIdsLinkedAction.add( mapIdActions.get( nIdActionLinked ) );
-            }
-
-            action.setListIdsLinkedAction( newListIdsLinkedAction );
-            _actionService.update( action );
-        }
-
-        return workflowToCopy.getId(  );
-    }
-
-    /**
-     * Copy the task whose key is specified in the Http request and update param
-     * if exists
-     * @param taskToCopy the task to copy
-     * @param mapParamToChange the map<String, String> of <Param, Value> to
-     *            change
-     * @throws NoSuchMethodException NoSuchMethodException the
-     *             {@link NoSuchMethodException}
-     * @throws IllegalAccessException IllegalAccessException the
-     *             {@link IllegalAccessException}
-     * @throws InvocationTargetException InvocationTargetException the
-     *             {@link InvocationTargetException}
-     */
-    private void doCopyTaskWithModifiedParam( ITask taskToCopy, Map<String, String> mapParamToChange )
-        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-    {
-        // Save nIdTaskToCopy
-        Integer nIdTaskToCopy = taskToCopy.getId(  );
-
-        //get the maximum order number in this workflow and set max+1
-        int nMaximumOrder = _taskService.findMaximumOrderByWorkflowId( taskToCopy.getAction(  ).getId(  ) );
-        taskToCopy.setOrder( nMaximumOrder + 1 );
-
-        // Create the new task (taskToCopy id will be update with the new idTask)
-        _taskService.create( taskToCopy );
-
-        // get all taskConfigService
-        List<ITaskConfigService> listTaskConfigService = SpringContextService.getBeansOfType( ITaskConfigService.class );
-
-        // For each taskConfigService, update parameter if exists
-        for ( ITaskConfigService taskConfigService : listTaskConfigService )
-        {
-            ITaskConfig taskConfig = taskConfigService.findByPrimaryKey( nIdTaskToCopy );
-
-            if ( taskConfig != null )
-            {
-                taskConfig.setIdTask( taskToCopy.getId(  ) );
-
-                if ( mapParamToChange != null )
-                {
-                    EntrySetMapIterator it = new EntrySetMapIterator( mapParamToChange );
-
-                    while ( it.hasNext(  ) )
-                    {
-                        String key = (String) it.next(  );
-                        String value = (String) it.getValue(  );
-                        MethodUtil.set( taskConfig, key, value );
-                    }
-                }
-
-                taskConfigService.create( taskConfig );
-            }
-        }
-    }
-
-    /**
-     * Copy a given directory
-     * @param directoryToCopy the directory to copy
-     * @param copyName the name of the copy
-     * @return the id of the copy
-     */
-    private int doCopyDirectory( Directory directoryToCopy, String copyName )
-    {
-        directoryToCopy.setTitle( copyName );
-        DirectoryHome.copy( directoryToCopy, getPlugin(  ) );
-
-        return directoryToCopy.getIdDirectory(  );
-    }
-
-    /**
-     * Copy a given form
-     * @param formToCopy the form to copy
-     * @param copyName the name of the copy
-     * @return the id of the copy
-     */
-    private int doCopyForm( Form formToCopy, String copyName )
-    {
-        formToCopy.setTitle( copyName );
-        FormHome.copy( formToCopy, getPlugin(  ) );
-
-        return formToCopy.getIdForm(  );
-    }
-
-    /**
-     * Copy a given directory and its workflow
-     * @param directoryToCopy the directory to copy
-     * @param copyName the name of the copy
-     * @return the id of the copy
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws NoSuchMethodException
-     */
-    private int doCopyDirectoryWithWorkflow( Directory directoryToCopy, String directoryCopyName,
-        String workflowCopyName ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-    {
-        Workflow workflowToCopy = _workflowService.findByPrimaryKey( directoryToCopy.getIdWorkflow(  ) );
-        int nIdWorkflowCopy = doCopyWorkflow( workflowToCopy, workflowCopyName );
-
-        directoryToCopy.setIdWorkflow( nIdWorkflowCopy );
-
-        int nIdDirectoryCopy = doCopyDirectory( directoryToCopy, directoryCopyName );
-
-        return nIdDirectoryCopy;
-    }
-
-    /**
-     * Copy a given form with its directory
-     * @param formToCopy the form to copy
-     * @param copyName the name of the copy
-     * @return the id of the copy
-     */
-    private int doCopyFormWithDirectory( Form formToCopy, String formCopyName, String directoryCopyName )
-    {
-        Directory directoryToCopy = getDirectoryAssociatedTo( formToCopy );
-        int nIdDirectoryCopy = doCopyDirectory( directoryToCopy, directoryCopyName );
-
-        int nIdFormCopy = doCopyForm( formToCopy, formCopyName );
-
-        // TODO copy export-directory
-        return nIdFormCopy;
-    }
-
-    /**
-     * Copy a given form with its directory and workflow
-     * @param formToCopy the form to copy
-     * @param copyName the name of the copy
-     * @return the id of the copy
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws NoSuchMethodException
-     */
-    private int doCopyFormWithDirectoryAndWorkflow( Form formToCopy, String formCopyName, String directoryCopyName,
-        String workflowCopyName ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-    {
-        Directory directoryToCopy = getDirectoryAssociatedTo( formToCopy );
-        int nIdDirectoryCopy = doCopyDirectoryWithWorkflow( directoryToCopy, directoryCopyName, workflowCopyName );
-
-        int nIdFormCopy = doCopyForm( formToCopy, formCopyName );
-
-        // TODO copy export-directory
-        return nIdFormCopy;
-    }
-
-    /**
-     * Performs extra duplications, parameters must be set to -1 if not needed
-     * @param nIdFormToCopy
-     * @param nIdCopyOfForm
-     * @param nIdDirectoryToCopy
-     * @param nIdCopyOfDirectory
-     * @param nIdWorkflowToCopy
-     * @param nIdCopyOfWorkflow
-     */
-    private void doExtraDuplication( int nIdFormToCopy, int nIdCopyOfForm, int nIdDirectoryToCopy,
-        int nIdCopyOfDirectory, int nIdWorkflowToCopy, int nIdCopyOfWorkflow )
-    {
-        Form formToCopy = null;
-        Form copyOfForm = null;
-        Directory directoryToCopy = null;
-        Directory copyOfDirectory = null;
-        Workflow workflowToCopy = null;
-        Workflow copyOfWorkflow = null;
-
-        if ( nIdFormToCopy > 0 )
-        {
-            formToCopy = FormHome.findByPrimaryKey( nIdFormToCopy, getPlugin(  ) );
-        }
-
-        if ( nIdCopyOfForm > 0 )
-        {
-            copyOfForm = FormHome.findByPrimaryKey( nIdCopyOfForm, getPlugin(  ) );
-        }
-
-        if ( nIdDirectoryToCopy > 0 )
-        {
-            directoryToCopy = DirectoryHome.findByPrimaryKey( nIdDirectoryToCopy, getPlugin(  ) );
-        }
-
-        if ( nIdCopyOfDirectory > 0 )
-        {
-            copyOfDirectory = DirectoryHome.findByPrimaryKey( nIdCopyOfDirectory, getPlugin(  ) );
-        }
-
-        if ( nIdWorkflowToCopy > 0 )
-        {
-            workflowToCopy = _workflowService.findByPrimaryKey( nIdWorkflowToCopy );
-        }
-
-        if ( nIdCopyOfWorkflow > 0 )
-        {
-            copyOfWorkflow = _workflowService.findByPrimaryKey( nIdCopyOfWorkflow );
-        }
-
-        DuplicationManager.doDuplicate( formToCopy, copyOfForm, directoryToCopy, copyOfDirectory, workflowToCopy,
-            copyOfWorkflow );
-    }
 }

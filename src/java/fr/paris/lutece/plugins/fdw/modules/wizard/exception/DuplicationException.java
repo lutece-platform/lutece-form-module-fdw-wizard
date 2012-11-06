@@ -31,30 +31,45 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.fdw.modules.wizard.service;
+package fr.paris.lutece.plugins.fdw.modules.wizard.exception;
 
-import fr.paris.lutece.plugins.fdw.modules.wizard.business.DuplicationContext;
-import fr.paris.lutece.plugins.fdw.modules.wizard.exception.DuplicationException;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-
-
-/**
- * Manages duplication of configurations from other plugins
- *
- */
-public class DuplicationManager
+public class DuplicationException extends Exception
 {
     /**
-     * Calls duplication methods of services from other plugins
-     * @param context the duplication context
-     * @throws DuplicationException
+     *
      */
-    public static void doDuplicate( DuplicationContext context )
-        throws DuplicationException
+    private static final long serialVersionUID = 8284743386231766364L;
+
+    /**
+     *
+     */
+    public DuplicationException(  )
     {
-        for ( IDuplicationService duplicationService : SpringContextService.getBeansOfType( IDuplicationService.class ) )
-        {
-            duplicationService.doDuplicate( context );
-        }
+        super(  );
+    }
+
+    /**
+     * @param message
+     * @param cause
+     */
+    public DuplicationException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
+
+    /**
+     * @param message
+     */
+    public DuplicationException( String message )
+    {
+        super( message );
+    }
+
+    /**
+     * @param cause
+     */
+    public DuplicationException( Throwable cause )
+    {
+        super( cause );
     }
 }
