@@ -4,5 +4,5 @@
 <% 
 	fdwWizard.init( request, fr.paris.lutece.plugins.fdw.modules.wizard.web.ManageWizardJspBean.RIGHT_MANAGE_WIZARD);
 %>
-<%= fdwWizard.getDuplicateDirectorySimpleSuccess( request ) %>
+<%= fdwWizard.getDuplicateForm( request ) %>
 <%@ include file="../../../../AdminFooter.jsp" %>

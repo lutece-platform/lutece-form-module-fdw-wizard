@@ -53,14 +53,15 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.method.MethodUtil;
 
+import org.apache.commons.collections.iterators.EntrySetMapIterator;
+
 import java.lang.reflect.InvocationTargetException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import org.apache.commons.collections.iterators.EntrySetMapIterator;
 
 
 /**
@@ -383,5 +384,28 @@ public class WizardService
         int nIdDirectoryCopy = doCopyDirectory( directoryToCopy, directoryCopyName, plugin );
 
         return nIdDirectoryCopy;
+    }
+
+    /**
+     * Gets the directory associted to a given form
+     * @param form the form
+     * @return the directory or null if no directory found
+     */
+    public Directory getDirectoryAssociatedToForm( Form form )
+    {
+        Directory directory = null;
+
+        for ( IFormDirectoryAssociationService associationService : SpringContextService.getBeansOfType( 
+                IFormDirectoryAssociationService.class ) )
+        {
+            Directory tmpDirectory = associationService.getDirectoryAssociatedToForm( form );
+
+            if ( tmpDirectory != null )
+            {
+                directory = tmpDirectory;
+            }
+        }
+
+        return directory;
     }
 }

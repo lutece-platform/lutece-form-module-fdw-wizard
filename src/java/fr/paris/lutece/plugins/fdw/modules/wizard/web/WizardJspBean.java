@@ -46,8 +46,6 @@ import fr.paris.lutece.plugins.fdw.modules.wizard.service.WizardService;
 import fr.paris.lutece.plugins.form.business.Form;
 import fr.paris.lutece.plugins.form.business.FormFilter;
 import fr.paris.lutece.plugins.form.business.FormHome;
-import fr.paris.lutece.plugins.form.modules.exportdirectory.business.FormConfiguration;
-import fr.paris.lutece.plugins.form.modules.exportdirectory.business.FormConfigurationHome;
 import fr.paris.lutece.plugins.form.utils.FormUtils;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
@@ -71,16 +69,17 @@ import fr.paris.lutece.util.datatable.DataTableManager;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.lang.reflect.InvocationTargetException;
+
 import java.text.MessageFormat;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -155,8 +154,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
     //jsp
     private static final String JSP_MANAGE_WIZARD = "jsp/admin/plugins/fdw/modules/wizard/ManageWizard.jsp";
     private static final String JSP_DUPLICATION_SUCCESS_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateWorkflowSuccess.jsp";
-    private static final String JSP_DUPLICATION_SUCCESS_DIRECTORY_SIMPLE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectorySimpleSuccess.jsp";
-    private static final String JSP_DUPLICATION_SUCCESS_DIRECTORY_WITH_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectoryWithWorkflowSuccess.jsp";
+    private static final String JSP_DUPLICATION_SUCCESS_DIRECTORY = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectorySuccess.jsp";
     private static final String JSP_DUPLICATE_DIRECTORY_SIMPLE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectorySimple.jsp";
     private static final String JSP_DUPLICATE_DIRECTORY_WITH_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectoryWithWorkflow.jsp";
     private static final String JSP_DUPLICATE_DIRECTORY_CHOICE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectoryChoice.jsp";
@@ -214,11 +212,9 @@ public class WizardJspBean extends PluginAdminPageJspBean
         model.put( MARK_DATA_TABLE_WORKFLOW, dataTableWorkflow );
 
         // form
-        DataTableManager<FormWithDirectory> dataTableForm = new DataTableManager<FormWithDirectory>( JSP_MANAGE_WIZARD,
-                "", 10, true );
-        dataTableForm.addColumn( "module.fdw.wizard.manage_plugin_fdw-wizard.form.row_title", "form.title", false );
-        dataTableForm.addColumn( "module.fdw.wizard.manage_plugin_fdw-wizard.form.row_description", "form.description",
-            false );
+        DataTableManager<Form> dataTableForm = new DataTableManager<Form>( JSP_MANAGE_WIZARD, "", 10, true );
+        dataTableForm.addColumn( "module.fdw.wizard.manage_plugin_fdw-wizard.form.row_title", "title", false );
+        dataTableForm.addColumn( "module.fdw.wizard.manage_plugin_fdw-wizard.form.row_description", "description", false );
         dataTableForm.addFreeColumn( "module.fdw.wizard.manage_plugin_fdw-wizard.form.row_actions",
             MACRO_COLUMN_ACTIONS_FORM );
 
@@ -226,21 +222,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
         List<Form> listForm = FormHome.getFormList( filterForm, getPlugin(  ) );
         listForm = (List<Form>) AdminWorkgroupService.getAuthorizedCollection( listForm, getUser(  ) );
 
-        List<FormWithDirectory> listFormWithDirectory = new ArrayList<FormWithDirectory>(  );
-
-        for ( Form form : listForm )
-        {
-            FormWithDirectory formWithDirectory = new FormWithDirectory(  );
-            formWithDirectory.setForm( form );
-
-            // retrieve the directory associated to the form if it exists
-            Directory directory = getDirectoryAssociatedTo( form );
-            formWithDirectory.setDirectory( directory );
-
-            listFormWithDirectory.add( formWithDirectory );
-        }
-
-        dataTableForm.filterSortAndPaginate( request, listFormWithDirectory );
+        dataTableForm.filterSortAndPaginate( request, listForm );
         model.put( MARK_DATA_TABLE_FORM, dataTableForm );
 
         Rights rights = new Rights(  );
@@ -350,7 +332,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
         if ( nIdWorkflow != WorkflowUtils.CONSTANT_ID_NULL )
         {
             workflow = _workflowService.findByPrimaryKey( nIdWorkflow );
-            strWorkflowName = workflow.getName( );
+            strWorkflowName = workflow.getName(  );
         }
 
         if ( workflow == null )
@@ -358,10 +340,8 @@ public class WizardJspBean extends PluginAdminPageJspBean
             throw new AccessDeniedException( "Workflow not found for ID " + nIdWorkflow );
         }
 
-        String strMessageSuccess = MessageFormat
-                .format(
-                I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_WORKFLOW,
-                                request.getLocale( ) ), strWorkflowName );
+        String strMessageSuccess = MessageFormat.format( I18nService.getLocalizedString( 
+                    PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_WORKFLOW, request.getLocale(  ) ), strWorkflowName );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_WORKFLOW, workflow );
@@ -478,7 +458,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
             }
 
             // success
-            url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATION_SUCCESS_DIRECTORY_SIMPLE );
+            url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATION_SUCCESS_DIRECTORY );
             url.addParameter( PARAMETER_ID_DIRECTORY, nIdDirectory );
             url.addParameter( PARAMETER_COPY_MODE, strCopyMode );
         }
@@ -502,7 +482,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * @return Html directory duplication success page
      * @throws AccessDeniedException
      */
-    public String getDuplicateDirectorySimpleSuccess( HttpServletRequest request )
+    public String getDuplicateDirectorySuccess( HttpServletRequest request )
         throws AccessDeniedException
     {
         String strIdDirectory = request.getParameter( PARAMETER_ID_DIRECTORY );
@@ -511,11 +491,10 @@ public class WizardJspBean extends PluginAdminPageJspBean
         String strCopyMode = request.getParameter( PARAMETER_COPY_MODE );
         String strDirectoryName = StringUtils.EMPTY;
 
-
         if ( nIdDirectory != WorkflowUtils.CONSTANT_ID_NULL )
         {
             directory = DirectoryHome.findByPrimaryKey( nIdDirectory, getPlugin(  ) );
-            strDirectoryName = directory.getTitle( );
+            strDirectoryName = directory.getTitle(  );
         }
 
         if ( directory == null )
@@ -525,18 +504,16 @@ public class WizardJspBean extends PluginAdminPageJspBean
 
         String strMessageSuccess = initSuccessMessageForDirectoryDuplication( request, strCopyMode, strDirectoryName );
 
-        Map<String, Object> model = new HashMap<String, Object>( );
+        Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_DIRECTORY, directory );
         model.put( MARK_COPY_MODE, strCopyMode );
         model.put( MARK_MESSAGE_SUCCESS, strMessageSuccess );
 
         HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_DUPLICATE_DIRECTORY_SIMPLE_SUCCESS,
-                getLocale( ), model );
+                getLocale(  ), model );
 
-        return getAdminPage( templateList.getHtml( ) );
+        return getAdminPage( templateList.getHtml(  ) );
     }
-
-
 
     /**
      * Return directory duplication choice page
@@ -657,24 +634,6 @@ public class WizardJspBean extends PluginAdminPageJspBean
                 getLocale(  ), model );
 
         return getAdminPage( templateList.getHtml(  ) );
-    }
-
-    /**
-     * Gets the directory associted to a given form
-     * @param form the form
-     * @return the directory or null if no directory found
-     */
-    private Directory getDirectoryAssociatedTo( Form form )
-    {
-        Directory directory = null;
-        FormConfiguration formConfiguration = FormConfigurationHome.findByPrimaryKey( form.getIdForm(  ), getPlugin(  ) );
-
-        if ( formConfiguration != null )
-        {
-            directory = DirectoryHome.findByPrimaryKey( formConfiguration.getIdDirectory(  ), getPlugin(  ) );
-        }
-
-        return directory;
     }
 
     /**
@@ -834,7 +793,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
         if ( nIdForm != WorkflowUtils.CONSTANT_ID_NULL )
         {
             form = FormHome.findByPrimaryKey( nIdForm, getPlugin(  ) );
-            strFormName = form.getTitle( );
+            strFormName = form.getTitle(  );
         }
 
         if ( form == null )
@@ -880,7 +839,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
 
         FormWithDirectory formWithDirectory = new FormWithDirectory(  );
         formWithDirectory.setForm( form );
-        formWithDirectory.setDirectory( getDirectoryAssociatedTo( form ) );
+        formWithDirectory.setDirectory( _wizardService.getDirectoryAssociatedToForm( form ) );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_FORM, form );
@@ -1032,23 +991,24 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * @return the success message
      */
     private String initSuccessMessageForDirectoryDuplication( HttpServletRequest request, String strCopyMode,
-            String strDirectoryName )
+        String strDirectoryName )
     {
         String strMessageSuccess = StringUtils.EMPTY;
+
         if ( strCopyMode.equals( COPY_MODE_DIRECTORY_ONLY ) )
         {
             //simple duplication
-            strMessageSuccess = MessageFormat.format(
-                    I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_DIRECTORY,
-                            request.getLocale( ) ), strDirectoryName );
+            strMessageSuccess = MessageFormat.format( I18nService.getLocalizedString( 
+                        PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_DIRECTORY, request.getLocale(  ) ), strDirectoryName );
         }
         else if ( strCopyMode.equals( COPY_MODE_DIRECTORY_WITH_WORKFLOW ) )
         {
             //duplication with workflow
-            strMessageSuccess = MessageFormat.format(
-                    I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_COPY_DIRECTORY_WITH_WORKFLOW,
-                            request.getLocale( ) ), strDirectoryName );
+            strMessageSuccess = MessageFormat.format( I18nService.getLocalizedString( 
+                        PARAMETER_MESSAGE_SUCCESS_COPY_DIRECTORY_WITH_WORKFLOW, request.getLocale(  ) ),
+                    strDirectoryName );
         }
+
         return strMessageSuccess;
     }
 
@@ -1061,34 +1021,99 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * @return the success message
      */
     private String initSuccessMessageForFormDuplication( HttpServletRequest request, String strCopyMode,
-            String strFormName )
+        String strFormName )
     {
         String strMessageSuccess = StringUtils.EMPTY;
+
         if ( strCopyMode.equals( COPY_MODE_FORM_ONLY ) )
         {
             //simple duplication
-            strMessageSuccess = MessageFormat.format(
-                    I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_FORM,
-                            request.getLocale( ) ), strFormName );
+            strMessageSuccess = MessageFormat.format( I18nService.getLocalizedString( 
+                        PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_FORM, request.getLocale(  ) ), strFormName );
         }
         else if ( strCopyMode.equals( COPY_MODE_FORM_WITH_DIRECTORY ) )
         {
             //duplication with directory and export configuration
-            strMessageSuccess = MessageFormat.format(
- I18nService.getLocalizedString(
-                    PARAMETER_MESSAGE_SUCCESS_COPY_FORM_WITH_DIRECTORY_AND_EXPORT,
-                            request.getLocale( ) ), strFormName );
+            strMessageSuccess = MessageFormat.format( I18nService.getLocalizedString( 
+                        PARAMETER_MESSAGE_SUCCESS_COPY_FORM_WITH_DIRECTORY_AND_EXPORT, request.getLocale(  ) ),
+                    strFormName );
         }
         else if ( strCopyMode.equals( COPY_MODE_FORM_WITH_DIRECTORY_AND_WORKFLOW ) )
         {
             //duplication with directory and workflow
-
-            strMessageSuccess = MessageFormat.format(
- I18nService.getLocalizedString(
-                    PARAMETER_MESSAGE_SUCCESS_COPY_FORM_WITH_DIRECTORY_AND_WORKFLOW,
-                            request.getLocale( ) ), strFormName );
+            strMessageSuccess = MessageFormat.format( I18nService.getLocalizedString( 
+                        PARAMETER_MESSAGE_SUCCESS_COPY_FORM_WITH_DIRECTORY_AND_WORKFLOW, request.getLocale(  ) ),
+                    strFormName );
         }
+
         return strMessageSuccess;
     }
 
+    /**
+     * Return directory duplication page
+     * @param request The Http request
+     * @return Html directory duplication page
+     * @throws AccessDeniedException
+     */
+    public String getDuplicateDirectory( HttpServletRequest request )
+        throws AccessDeniedException
+    {
+        String strIdDirectory = request.getParameter( PARAMETER_ID_DIRECTORY );
+        int nIdDirectory = DirectoryUtils.convertStringToInt( strIdDirectory );
+        Directory directory = null;
+
+        if ( nIdDirectory != WorkflowUtils.CONSTANT_ID_NULL )
+        {
+            directory = DirectoryHome.findByPrimaryKey( nIdDirectory, getPlugin(  ) );
+        }
+
+        if ( directory == null )
+        {
+            throw new AccessDeniedException( "Directory not found for ID " + nIdDirectory );
+        }
+
+        if ( directory.getIdWorkflow(  ) > 0 )
+        {
+            return getDuplicateDirectoryChoice( request );
+        }
+        else
+        {
+            return getDuplicateDirectorySimple( request );
+        }
+    }
+
+    /**
+     * Return form duplication page
+     * @param request The Http request
+     * @return Html form duplication page
+     * @throws AccessDeniedException
+     */
+    public String getDuplicateForm( HttpServletRequest request )
+        throws AccessDeniedException
+    {
+        String strIdForm = request.getParameter( PARAMETER_ID_FORM );
+        int nIdForm = FormUtils.convertStringToInt( strIdForm );
+        Form form = null;
+
+        if ( nIdForm != WorkflowUtils.CONSTANT_ID_NULL )
+        {
+            form = FormHome.findByPrimaryKey( nIdForm, getPlugin(  ) );
+        }
+
+        if ( form == null )
+        {
+            throw new AccessDeniedException( "Form not found for ID " + nIdForm );
+        }
+
+        Directory directory = _wizardService.getDirectoryAssociatedToForm( form );
+
+        if ( directory != null )
+        {
+            return getDuplicateFormChoice( request );
+        }
+        else
+        {
+            return getDuplicateFormSimple( request );
+        }
+    }
 }
