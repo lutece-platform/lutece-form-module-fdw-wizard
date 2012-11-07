@@ -111,6 +111,8 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_WORKFLOW = "module.fdw.wizard.duplication.workflow.success";
     private static final String PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_FORM = "module.fdw.wizard.duplication.form.success";
     private static final String PARAMETER_MESSAGE_SUCCESS_COPY_DIRECTORY_WITH_WORKFLOW = "module.fdw.wizard.duplication.directory.with_workflow.success";
+    private static final String PARAMETER_MESSAGE_SUCCESS_COPY_FORM_WITH_DIRECTORY_AND_EXPORT = "module.fdw.wizard.duplication.form.with_directory.success";
+    private static final String PARAMETER_MESSAGE_SUCCESS_COPY_FORM_WITH_DIRECTORY_AND_WORKFLOW = "module.fdw.wizard.duplication.form.with_directory_and_workflow.success";
 
     //copy modes
     private static final String COPY_MODE_DIRECTORY_ONLY = "directoryOnly";
@@ -534,34 +536,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
         return getAdminPage( templateList.getHtml( ) );
     }
 
-    /**
-     * Inits the success message for directory duplication, depends on the type
-     * of duplication
-     * @param request
-     * @param strCopyMode
-     * @param strDirectoryName
-     * @return the success message
-     */
-    private String initSuccessMessageForDirectoryDuplication( HttpServletRequest request, String strCopyMode,
-            String strDirectoryName )
-    {
-        String strMessageSuccess = StringUtils.EMPTY;
-        if ( strCopyMode.equals( COPY_MODE_DIRECTORY_ONLY ) )
-        {
-            //simple duplication
-            strMessageSuccess = MessageFormat.format(
-                    I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_DIRECTORY,
-                            request.getLocale( ) ), strDirectoryName );
-        }
-        else if ( strCopyMode.equals( COPY_MODE_DIRECTORY_WITH_WORKFLOW ) )
-        {
-            //duplication with workflow
-            strMessageSuccess = MessageFormat.format(
-                    I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_COPY_DIRECTORY_WITH_WORKFLOW,
-                            request.getLocale( ) ), strDirectoryName );
-        }
-        return strMessageSuccess;
-    }
+
 
     /**
      * Return directory duplication choice page
@@ -867,9 +842,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
             throw new AccessDeniedException( "Form not found for ID " + nIdForm );
         }
 
-        String strMessageSuccess = MessageFormat.format(
-                I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_FORM, request.getLocale( ) ),
-                strFormName );
+        String strMessageSuccess = initSuccessMessageForFormDuplication( request, strCopyMode, strFormName );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_FORM, form );
@@ -1048,6 +1021,74 @@ public class WizardJspBean extends PluginAdminPageJspBean
                 getLocale(  ), model );
 
         return getAdminPage( templateList.getHtml(  ) );
+    }
+
+    /**
+     * Inits the success message for directory duplication, depends on the type
+     * of duplication
+     * @param request
+     * @param strCopyMode
+     * @param strDirectoryName
+     * @return the success message
+     */
+    private String initSuccessMessageForDirectoryDuplication( HttpServletRequest request, String strCopyMode,
+            String strDirectoryName )
+    {
+        String strMessageSuccess = StringUtils.EMPTY;
+        if ( strCopyMode.equals( COPY_MODE_DIRECTORY_ONLY ) )
+        {
+            //simple duplication
+            strMessageSuccess = MessageFormat.format(
+                    I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_DIRECTORY,
+                            request.getLocale( ) ), strDirectoryName );
+        }
+        else if ( strCopyMode.equals( COPY_MODE_DIRECTORY_WITH_WORKFLOW ) )
+        {
+            //duplication with workflow
+            strMessageSuccess = MessageFormat.format(
+                    I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_COPY_DIRECTORY_WITH_WORKFLOW,
+                            request.getLocale( ) ), strDirectoryName );
+        }
+        return strMessageSuccess;
+    }
+
+    /**
+     * Inits the success message for form duplication, depends on the type
+     * of duplication
+     * @param request
+     * @param strCopyMode
+     * @param strFormName
+     * @return the success message
+     */
+    private String initSuccessMessageForFormDuplication( HttpServletRequest request, String strCopyMode,
+            String strFormName )
+    {
+        String strMessageSuccess = StringUtils.EMPTY;
+        if ( strCopyMode.equals( COPY_MODE_FORM_ONLY ) )
+        {
+            //simple duplication
+            strMessageSuccess = MessageFormat.format(
+                    I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_FORM,
+                            request.getLocale( ) ), strFormName );
+        }
+        else if ( strCopyMode.equals( COPY_MODE_FORM_WITH_DIRECTORY ) )
+        {
+            //duplication with directory and export configuration
+            strMessageSuccess = MessageFormat.format(
+ I18nService.getLocalizedString(
+                    PARAMETER_MESSAGE_SUCCESS_COPY_FORM_WITH_DIRECTORY_AND_EXPORT,
+                            request.getLocale( ) ), strFormName );
+        }
+        else if ( strCopyMode.equals( COPY_MODE_FORM_WITH_DIRECTORY_AND_WORKFLOW ) )
+        {
+            //duplication with directory and workflow
+
+            strMessageSuccess = MessageFormat.format(
+ I18nService.getLocalizedString(
+                    PARAMETER_MESSAGE_SUCCESS_COPY_FORM_WITH_DIRECTORY_AND_WORKFLOW,
+                            request.getLocale( ) ), strFormName );
+        }
+        return strMessageSuccess;
     }
 
 }
