@@ -61,6 +61,7 @@ import fr.paris.lutece.plugins.workflowcore.service.task.TaskService;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
@@ -70,16 +71,16 @@ import fr.paris.lutece.util.datatable.DataTableManager;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.lang.reflect.InvocationTargetException;
-
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -106,6 +107,9 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String VALUE_FORM_CHOICE_SIMPLE = "DuplicationSimple";
     private static final String VALUE_FORM_CHOICE_WITH_DIRECTORY = "DuplicationWithDirectory";
     private static final String VALUE_FORM_CHOICE_WITH_DIRECTORY_AND_WORKFLOW = "DuplicationWithDirectoryAndWorkflow";
+    private static final String PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_DIRECTORY = "module.fdw.wizard.duplication.directory.success";
+    private static final String PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_WORKFLOW = "module.fdw.wizard.duplication.workflow.success";
+    private static final String PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_FORM = "module.fdw.wizard.duplication.form.success";
 
     //copy modes
     private static final String COPY_MODE_DIRECTORY_ONLY = "directoryOnly";
@@ -124,6 +128,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String MARK_FORM_WITH_DIRECTORY = "formWithDirectory";
     private static final String MARK_FROM_CHOICE = "fromChoice";
     private static final String MARK_COPY_MODE = "copyMode";
+    private static final String MARK_MESSAGE_SUCCESS = "messageSuccess";
 
     //macro column names
     private static final String MACRO_COLUMN_ACTIONS_DIRECTORY = "columnActionsDirectory";
@@ -337,10 +342,12 @@ public class WizardJspBean extends PluginAdminPageJspBean
         String strIdWorkflow = request.getParameter( PARAMETER_ID_WORKFLOW );
         int nIdWorkflow = WorkflowUtils.convertStringToInt( strIdWorkflow );
         Workflow workflow = null;
+        String strWorkflowName = StringUtils.EMPTY;
 
         if ( nIdWorkflow != WorkflowUtils.CONSTANT_ID_NULL )
         {
             workflow = _workflowService.findByPrimaryKey( nIdWorkflow );
+            strWorkflowName = workflow.getName( );
         }
 
         if ( workflow == null )
@@ -348,8 +355,14 @@ public class WizardJspBean extends PluginAdminPageJspBean
             throw new AccessDeniedException( "Workflow not found for ID " + nIdWorkflow );
         }
 
+        String strMessageSuccess = MessageFormat
+                .format(
+                I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_WORKFLOW,
+                                request.getLocale( ) ), strWorkflowName );
+
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_WORKFLOW, workflow );
+        model.put( MARK_MESSAGE_SUCCESS, strMessageSuccess );
 
         HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_DUPLICATE_WORKFLOW_SUCCESS, getLocale(  ),
                 model );
@@ -493,10 +506,12 @@ public class WizardJspBean extends PluginAdminPageJspBean
         int nIdDirectory = DirectoryUtils.convertStringToInt( strIdDirectory );
         Directory directory = null;
         String strCopyMode = request.getParameter( PARAMETER_COPY_MODE );
+        String strDirectoryName = StringUtils.EMPTY;
 
         if ( nIdDirectory != WorkflowUtils.CONSTANT_ID_NULL )
         {
             directory = DirectoryHome.findByPrimaryKey( nIdDirectory, getPlugin(  ) );
+            strDirectoryName = directory.getTitle( );
         }
 
         if ( directory == null )
@@ -504,9 +519,14 @@ public class WizardJspBean extends PluginAdminPageJspBean
             throw new AccessDeniedException( "Directory not found for ID " + nIdDirectory );
         }
 
+        String strMessageSuccess = MessageFormat.format( I18nService.getLocalizedString(
+ PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_DIRECTORY,
+                                request.getLocale( ) ), strDirectoryName );
+
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_DIRECTORY, directory );
         model.put( MARK_COPY_MODE, strCopyMode );
+        model.put( MARK_MESSAGE_SUCCESS, strMessageSuccess );
 
         HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_DUPLICATE_DIRECTORY_SIMPLE_SUCCESS,
                 getLocale(  ), model );
@@ -805,10 +825,12 @@ public class WizardJspBean extends PluginAdminPageJspBean
         int nIdForm = FormUtils.convertStringToInt( strIdForm );
         Form form = null;
         String strCopyMode = request.getParameter( PARAMETER_COPY_MODE );
+        String strFormName = StringUtils.EMPTY;
 
         if ( nIdForm != WorkflowUtils.CONSTANT_ID_NULL )
         {
             form = FormHome.findByPrimaryKey( nIdForm, getPlugin(  ) );
+            strFormName = form.getTitle( );
         }
 
         if ( form == null )
@@ -816,9 +838,14 @@ public class WizardJspBean extends PluginAdminPageJspBean
             throw new AccessDeniedException( "Form not found for ID " + nIdForm );
         }
 
+        String strMessageSuccess = MessageFormat.format(
+                I18nService.getLocalizedString( PARAMETER_MESSAGE_SUCCESS_SIMPLE_COPY_FORM, request.getLocale( ) ),
+                strFormName );
+
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_FORM, form );
         model.put( MARK_COPY_MODE, strCopyMode );
+        model.put( MARK_MESSAGE_SUCCESS, strMessageSuccess );
 
         HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_DUPLICATE_FORM_SUCCESS, getLocale(  ),
                 model );
