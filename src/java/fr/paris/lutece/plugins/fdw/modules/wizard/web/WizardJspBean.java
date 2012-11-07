@@ -69,17 +69,15 @@ import fr.paris.lutece.util.datatable.DataTableManager;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.lang.reflect.InvocationTargetException;
-
 import java.text.MessageFormat;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -88,6 +86,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class WizardJspBean extends PluginAdminPageJspBean
 {
+
+    private Exception _duplicationErrorMessage;
+
     //parameters
     private static final String PARAMETER_ID_WORKFLOW = "id_workflow";
     private static final String PARAMETER_ID_DIRECTORY = "id_directory";
@@ -131,6 +132,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String MARK_FROM_CHOICE = "fromChoice";
     private static final String MARK_COPY_MODE = "copyMode";
     private static final String MARK_MESSAGE_SUCCESS = "messageSuccess";
+    private static final String MARK_STACK_ERROR = "stackError";
 
     //macro column names
     private static final String MACRO_COLUMN_ACTIONS_DIRECTORY = "columnActionsDirectory";
@@ -150,6 +152,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String TEMPLATE_DUPLICATE_FORM_CHOICE = "admin/plugins/fdw/modules/wizard/duplicate_form_choice.html";
     private static final String TEMPLATE_DUPLICATE_FORM_WITH_DIRECTORY = "admin/plugins/fdw/modules/wizard/duplicate_form_with_directory.html";
     private static final String TEMPLATE_DUPLICATE_FORM_WITH_DIRECTORY_AND_WORKFLOW = "admin/plugins/fdw/modules/wizard/duplicate_form_with_directory_and_workflow.html";
+    private static final String TEMPLATE_DUPLICATION_ERROR = "admin/plugins/fdw/modules/wizard/duplication_error.html";
 
     //jsp
     private static final String JSP_MANAGE_WIZARD = "jsp/admin/plugins/fdw/modules/wizard/ManageWizard.jsp";
@@ -163,6 +166,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String JSP_DUPLICATE_FORM_WITH_DIRECTORY = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormWithDirectory.jsp";
     private static final String JSP_DUPLICATE_FORM_WITH_DIRECTORY_AND_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormWithDirectoryAndWorkflow.jsp";
     private static final String JSP_DUPLICATE_FORM_CHOICE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormChoice.jsp";
+    private static final String JSP_ERROR_DUPLICATION = "jsp/admin/plugins/fdw/modules/wizard/ErrorDuplication.jsp";
 
     //services
     private IWorkflowService _workflowService = SpringContextService.getBean( WorkflowService.BEAN_SERVICE );
@@ -292,20 +296,32 @@ public class WizardJspBean extends PluginAdminPageJspBean
 
         if ( request.getParameter( PARAMETER_DUPLICATE ) != null )
         {
-            // simple copy
-            String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
-            int nIdWorkflowCopy = _wizardService.doCopyWorkflow( workflow, strWorkflowCopyTitle, this.getLocale(  ) );
+            try
+            {
+                // simple copy
+                String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
+                int nIdWorkflowCopy = _wizardService.doCopyWorkflow( workflow, strWorkflowCopyTitle, this.getLocale( ) );
 
-            DuplicationContext context = new DuplicationContext(  );
-            context.setLocale( this.getLocale(  ) );
-            context.setPlugin( getPlugin(  ) );
-            context.setWorkflowDuplication( true );
-            context.setWorkflowToCopy( _wizardService.getWorkflow( nIdWorkflow ) );
-            context.setWorkflowCopy( _wizardService.getWorkflow( nIdWorkflowCopy ) );
-            DuplicationManager.doDuplicate( context );
+                DuplicationContext context = new DuplicationContext( );
+                context.setLocale( this.getLocale( ) );
+                context.setPlugin( getPlugin( ) );
+                context.setWorkflowDuplication( true );
+                context.setWorkflowToCopy( _wizardService.getWorkflow( nIdWorkflow ) );
+                context.setWorkflowCopy( _wizardService.getWorkflow( nIdWorkflowCopy ) );
+                DuplicationManager.doDuplicate( context );
 
-            url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATION_SUCCESS_WORKFLOW );
-            url.addParameter( PARAMETER_ID_WORKFLOW, nIdWorkflow );
+                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATION_SUCCESS_WORKFLOW );
+                url.addParameter( PARAMETER_ID_WORKFLOW, nIdWorkflow );
+
+                //throw new Exception( "Impossible to duplicate" );
+            }
+            catch ( Exception e )
+            {
+                //go to the error page
+                _duplicationErrorMessage = e;
+                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_ERROR_DUPLICATION );
+            }
+
         }
         else
         {
@@ -1115,5 +1131,22 @@ public class WizardJspBean extends PluginAdminPageJspBean
         {
             return getDuplicateFormSimple( request );
         }
+    }
+
+    /**
+     * Gets the duplication error page
+     * @param request the request
+     * @return the duplication error page url
+     */
+    public String getErrorDuplicationPage( HttpServletRequest request )
+    {
+        Map<String, Object> model = new HashMap<String, Object>( );
+        model.put( MARK_STACK_ERROR, _duplicationErrorMessage.getMessage( ) );
+
+        _duplicationErrorMessage = null;
+
+        HtmlTemplate templateList = AppTemplateService.getTemplate( TEMPLATE_DUPLICATION_ERROR, getLocale( ), model );
+
+        return getAdminPage( templateList.getHtml( ) );
     }
 }
