@@ -41,12 +41,13 @@ import fr.paris.lutece.plugins.fdw.modules.wizard.exception.DuplicationException
  * Interface for duplication service
  *
  */
-public interface IDuplicationService
+public abstract class DuplicationService extends ServiceWithPriority
 {
     /**
      * Duplicates configurations of forms, directories and/or workflows
      * @param context the duplication context
      * @throws DuplicationException if an error occurs during duplication
      */
-    void doDuplicate( DuplicationContext context ) throws DuplicationException;
+    public abstract void doDuplicate( DuplicationContext context )
+        throws DuplicationException;
 }

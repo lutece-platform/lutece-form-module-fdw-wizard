@@ -408,4 +408,13 @@ public class WizardService
 
         return directory;
     }
+
+    /**
+     * Deletes a given workflow
+     * @param nIdWorkflow the id of the workflow
+     */
+    public void deleteWorkflow( int nIdWorkflow )
+    {
+        _workflowService.remove( nIdWorkflow );
+    }
 }

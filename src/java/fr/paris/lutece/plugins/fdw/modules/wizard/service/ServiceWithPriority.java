@@ -33,36 +33,35 @@
  */
 package fr.paris.lutece.plugins.fdw.modules.wizard.service;
 
-import fr.paris.lutece.plugins.fdw.modules.wizard.business.DuplicationContext;
-import fr.paris.lutece.plugins.fdw.modules.wizard.exception.DuplicationException;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-
-import java.util.Collections;
-import java.util.List;
-
 
 /**
- * Manages duplication of configurations from other plugins
+ * Class for creating services with priority in order to execute these services
+ * in a specific order
  *
  */
-public class DuplicationManager
+public abstract class ServiceWithPriority implements Comparable<ServiceWithPriority>
 {
+    int _nPriority;
+
     /**
-     * Calls duplication methods of services from other plugins
-     * @param context the duplication context
-     * @throws DuplicationException
+     * @return the priority
      */
-    public static void doDuplicate( DuplicationContext context )
-        throws DuplicationException
+    public int getPriority(  )
     {
-        List<DuplicationService> listServices = SpringContextService.getBeansOfType( DuplicationService.class );
+        return _nPriority;
+    }
 
-        //services are sorted by priority
-        Collections.sort( listServices );
+    /**
+     * @param nPriority the priority to set
+     */
+    public void setPriority( int nPriority )
+    {
+        this._nPriority = nPriority;
+    }
 
-        for ( DuplicationService duplicationService : listServices )
-        {
-            duplicationService.doDuplicate( context );
-        }
+    @Override
+    public int compareTo( ServiceWithPriority o )
+    {
+        return this._nPriority - o._nPriority;
     }
 }
