@@ -59,6 +59,8 @@ import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.message.AdminMessage;
+import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
@@ -163,6 +165,17 @@ public class WizardJspBean extends PluginAdminPageJspBean
     private static final String JSP_DUPLICATE_FORM_WITH_DIRECTORY_AND_WORKFLOW = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormWithDirectoryAndWorkflow.jsp";
     private static final String JSP_DUPLICATE_FORM_CHOICE = "jsp/admin/plugins/fdw/modules/wizard/DuplicateFormChoice.jsp";
     private static final String JSP_ERROR_DUPLICATION = "jsp/admin/plugins/fdw/modules/wizard/ErrorDuplication.jsp";
+
+    //field name
+    private static final String FIELD_WORKFLOW_TITLE_WORKFLOW = "module.fdw.wizard.duplication.workflow.input_title";
+    private static final String FIELD_DIRECTORY_TITLE_DIRECTORY = "module.fdw.wizard.duplication.directory.input_title";
+    private static final String FIELD_DIRECTORY_TITLE_WORKFLOW = "module.fdw.wizard.duplication.directory.input_title_workflow";
+    private static final String FIELD_FORM_TITLE_FORM = "module.fdw.wizard.duplication.form.input_title";
+    private static final String FIELD_FORM_TITLE_DIRECTORY = "module.fdw.wizard.duplication.form.input_directory_title";
+    private static final String FIELD_FORM_TITLE_WORKFLOW = "module.fdw.wizard.duplication.form.input_workflow_title";
+
+    //mandatory field error message
+    private static final String MESSAGE_MANDATORY_FIELD = "module.fdw.wizard.duplication.error.mandatory_field";
 
     //error
     private Exception _duplicationErrorMessage;
@@ -296,11 +309,25 @@ public class WizardJspBean extends PluginAdminPageJspBean
             if ( request.getParameter( PARAMETER_DUPLICATE ) != null )
             {
                 int nIdWorkflowCopy = WorkflowUtils.CONSTANT_ID_NULL;
+                String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
+                String strFieldError = null;
+
+                if ( StringUtils.isBlank( strWorkflowCopyTitle ) )
+                {
+                    strFieldError = FIELD_WORKFLOW_TITLE_WORKFLOW;
+                }
+
+                if ( StringUtils.isNotBlank( strFieldError ) )
+                {
+                    Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
+
+                    return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
+                        AdminMessage.TYPE_STOP );
+                }
 
                 try
                 {
                     // simple copy
-                    String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
                     nIdWorkflowCopy = _wizardService.doCopyWorkflow( workflow, strWorkflowCopyTitle, this.getLocale(  ) );
 
                     DuplicationContext context = new DuplicationContext(  );
@@ -442,6 +469,20 @@ public class WizardJspBean extends PluginAdminPageJspBean
             String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
             int nIdDirectoryCopy = DirectoryUtils.CONSTANT_ID_NULL;
             int nIdWorkflowCopy = WorkflowUtils.CONSTANT_ID_NULL;
+            String strFieldError = null;
+
+            if ( StringUtils.isBlank( strDirectoryCopyTitle ) )
+            {
+                strFieldError = FIELD_DIRECTORY_TITLE_DIRECTORY;
+            }
+
+            if ( StringUtils.isNotBlank( strFieldError ) )
+            {
+                Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
+
+                return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
+                    AdminMessage.TYPE_STOP );
+            }
 
             try
             {
@@ -465,6 +506,20 @@ public class WizardJspBean extends PluginAdminPageJspBean
                     // copy with workflow
                     int nIdWorkflowToCopy = directory.getIdWorkflow(  );
                     String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
+
+                    if ( StringUtils.isBlank( strWorkflowCopyTitle ) )
+                    {
+                        strFieldError = FIELD_DIRECTORY_TITLE_WORKFLOW;
+                    }
+
+                    if ( StringUtils.isNotBlank( strFieldError ) )
+                    {
+                        Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
+
+                        return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
+                            AdminMessage.TYPE_STOP );
+                    }
+
                     nIdDirectoryCopy = _wizardService.doCopyDirectoryWithWorkflow( directory, strDirectoryCopyTitle,
                             strWorkflowCopyTitle, getPlugin(  ), this.getLocale(  ) );
                     nIdWorkflowCopy = directory.getIdWorkflow(  );
@@ -744,6 +799,20 @@ public class WizardJspBean extends PluginAdminPageJspBean
             String strCopyMode = request.getParameter( PARAMETER_COPY_MODE );
             String strFormCopyTitle = request.getParameter( PARAMETER_FORM_TITLE );
             int nIdFormCopy = FormUtils.CONSTANT_ID_NULL;
+            String strFieldError = null;
+
+            if ( StringUtils.isBlank( strFormCopyTitle ) )
+            {
+                strFieldError = FIELD_FORM_TITLE_FORM;
+            }
+
+            if ( StringUtils.isNotBlank( strFieldError ) )
+            {
+                Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
+
+                return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
+                    AdminMessage.TYPE_STOP );
+            }
 
             try
             {
@@ -764,6 +833,19 @@ public class WizardJspBean extends PluginAdminPageJspBean
                 {
                     String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
 
+                    if ( StringUtils.isBlank( strDirectoryCopyTitle ) )
+                    {
+                        strFieldError = FIELD_FORM_TITLE_DIRECTORY;
+                    }
+
+                    if ( StringUtils.isNotBlank( strFieldError ) )
+                    {
+                        Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
+
+                        return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
+                            AdminMessage.TYPE_STOP );
+                    }
+
                     nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin(  ) );
 
                     DuplicationContext context = new DuplicationContext(  );
@@ -780,6 +862,23 @@ public class WizardJspBean extends PluginAdminPageJspBean
                 {
                     String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
                     String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
+
+                    if ( StringUtils.isBlank( strDirectoryCopyTitle ) )
+                    {
+                        strFieldError = FIELD_FORM_TITLE_DIRECTORY;
+                    }
+                    else if ( StringUtils.isBlank( strWorkflowCopyTitle ) )
+                    {
+                        strFieldError = FIELD_FORM_TITLE_WORKFLOW;
+                    }
+
+                    if ( StringUtils.isNotBlank( strFieldError ) )
+                    {
+                        Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
+
+                        return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
+                            AdminMessage.TYPE_STOP );
+                    }
 
                     nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin(  ) );
 
