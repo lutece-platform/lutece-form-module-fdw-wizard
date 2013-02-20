@@ -8,30 +8,27 @@
 	</#if>
 </#if>
 
-<div class="container">
+<div class="row-fluid">
+	<div class="span12">
 	<fieldset>
-		<legend>
-			#i18n{module.fdw.wizard.duplication.form.title_choice}
-		</legend>
+		<legend>#i18n{module.fdw.wizard.duplication.form.title_choice}</legend>
+		<form method="post" action="jsp/admin/plugins/fdw/modules/wizard/DoDuplicateFormChoice.jsp?id_form=${form.idForm}" style="margin: 0px">
+			<input type="radio" name="choice" value="DuplicationSimple" checked="checked" />#i18n{module.fdw.wizard.duplication.form.choice.simple}
+			<#if withDirectory>
+				<input type="radio" name="choice" value="DuplicationWithDirectory" />#i18n{module.fdw.wizard.duplication.form.choice.with_directory}
+			</#if>
+			<#if withWorkflow >
+				<input type="radio" name="choice" value="DuplicationWithDirectoryAndWorkflow" />#i18n{module.fdw.wizard.duplication.form.choice.with_directory_and_workflow}
+			</#if>
+			<button type="submit" class="btn btn-primary" name="next" title="#i18n{module.fdw.wizard.duplication.button_next}" value="#i18n{module.fdw.wizard.duplication.button_next}" >
+				#i18n{module.fdw.wizard.duplication.button_next}
+			</button>
+			<button type="submit" class="btn btn-primary" name="cancel" title="#i18n{module.fdw.wizard.duplication.button_cancel}" value="#i18n{module.fdw.wizard.duplication.button_cancel}" >
+				#i18n{module.fdw.wizard.duplication.button_cancel}
+			</button>
+		</form>
 	</fieldset>
-	<form method="post" action="jsp/admin/plugins/fdw/modules/wizard/DoDuplicateFormChoice.jsp?id_form=${form.idForm}" style="margin: 0px">
-		<input type="radio" name="choice" value="DuplicationSimple" checked="checked" />#i18n{module.fdw.wizard.duplication.form.choice.simple}
-		<br /><br />
-		<#if withDirectory>
-			<input type="radio" name="choice" value="DuplicationWithDirectory" />#i18n{module.fdw.wizard.duplication.form.choice.with_directory}
-			<br /><br />
-		</#if>
-		<#if withWorkflow >
-			<input type="radio" name="choice" value="DuplicationWithDirectoryAndWorkflow" />#i18n{module.fdw.wizard.duplication.form.choice.with_directory_and_workflow}
-			<br /><br />
-		</#if>
-		<button type="submit" class="btn btn-primary" name="next" title="#i18n{module.fdw.wizard.duplication.button_next}" value="#i18n{module.fdw.wizard.duplication.button_next}" >
-			#i18n{module.fdw.wizard.duplication.button_next}
-		</button>
-		<button type="submit" class="btn btn-primary" name="cancel" title="#i18n{module.fdw.wizard.duplication.button_cancel}" value="#i18n{module.fdw.wizard.duplication.button_cancel}" >
-			#i18n{module.fdw.wizard.duplication.button_cancel}
-		</button>
-	</form>
+	</div>
 </div>
 
 

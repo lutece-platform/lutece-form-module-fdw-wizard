@@ -1,4 +1,5 @@
-<div class="container">
+<div class="row-fluid">
+	<div class="span12">
 	<fieldset>
 		<legend>
 			<#if copyMode == "directoryOnly" >
@@ -7,12 +8,10 @@
 				#i18n{module.fdw.wizard.duplication.directory.title_with_workflow}
 			</#if>
 		</legend>
+		<div class="alert alert-success">${messageSuccess!}</div>
+		<a class="btn btn-primary" href="jsp/admin/plugins/fdw/modules/wizard/ManageWizard.jsp" title="#i18n{module.fdw.wizard.duplication.button_back}">
+			#i18n{module.fdw.wizard.duplication.button_back}
+		</a> 
 	</fieldset>
-		${messageSuccess!}
-	<br /><br />
-
-	<a class="btn btn-primary" href="jsp/admin/plugins/fdw/modules/wizard/ManageWizard.jsp" title="#i18n{module.fdw.wizard.duplication.button_back}">
-		#i18n{module.fdw.wizard.duplication.button_back}
-	</a> 
-	<br /><br />
+	</div>
 </div>

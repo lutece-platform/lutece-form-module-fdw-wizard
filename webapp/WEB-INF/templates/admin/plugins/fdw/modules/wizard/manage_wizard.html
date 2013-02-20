@@ -1,55 +1,57 @@
 <#macro columnActionsDirectory item >
-	<a title="#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.directory.button_duplicate}" href="jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectory.jsp?id_directory=${item.idDirectory}" class="btn btn-primary btn-mini">
-         #i18n{module.fdw.wizard.manage_plugin_fdw-wizard.directory.button_duplicate}
+	<a title="#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.directory.button_duplicate}" href="jsp/admin/plugins/fdw/modules/wizard/DuplicateDirectory.jsp?id_directory=${item.idDirectory}" class="btn btn-primary btn-small" title=" #i18n{module.fdw.wizard.manage_plugin_fdw-wizard.directory.button_duplicate}">
+        <i class="icon-plus-sign icon-white"></i>
     </a>
     <#if rights.isAuthorizedJspDirectory("jsp/admin/plugins/directory/ModifyDirectory.jsp",(item.idDirectory)!?string)> 
-	    <a class="btn btn-primary btn-mini" href="jsp/admin/plugins/directory/ModifyDirectory.jsp?id_directory=${item.idDirectory}" title="modifier">
-	            <i class="icon-edit icon-white"></i>
+	    <a class="btn btn-primary btn-small" href="jsp/admin/plugins/directory/ModifyDirectory.jsp?id_directory=${item.idDirectory}" title="modifier">
+	        <i class="icon-edit icon-white"></i>
 	    </a>
 	</#if>
 </#macro>
 
 <#macro columnActionsForm item >
-	<a title="#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.form.button_duplicate}" href="jsp/admin/plugins/fdw/modules/wizard/DuplicateForm.jsp?id_form=${item.idForm}" class="btn btn-primary btn-mini">
-         #i18n{module.fdw.wizard.manage_plugin_fdw-wizard.form.button_duplicate}
+	<a title="#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.form.button_duplicate}" href="jsp/admin/plugins/fdw/modules/wizard/DuplicateForm.jsp?id_form=${item.idForm}" class="btn btn-primary btn-small" title="#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.form.button_duplicate}">
+         <i class="icon-plus-sign icon-white"></i>
     </a>
   	<#if rights.isAuthorizedJspForm("jsp/admin/plugins/form/ModifyForm.jsp",(item.idForm)!?string)> 
-	    <a class="btn btn-primary btn-mini" href="jsp/admin/plugins/form/ModifyForm.jsp?id_form=${item.idForm}" title="modifier">
+	    <a class="btn btn-primary btn-small" href="jsp/admin/plugins/form/ModifyForm.jsp?id_form=${item.idForm}" title="modifier">
 	            <i class="icon-edit icon-white"></i>
 	    </a>
 	</#if>
 </#macro>
 
 <#macro columnActionsWorkflow item >
-	<a title="#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.workflow.button_duplicate}" href="jsp/admin/plugins/fdw/modules/wizard/DuplicateWorkflow.jsp?id_workflow=${item.id}" class="btn btn-primary btn-mini">
-         #i18n{module.fdw.wizard.manage_plugin_fdw-wizard.workflow.button_duplicate}
+	<a title="#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.workflow.button_duplicate}" href="jsp/admin/plugins/fdw/modules/wizard/DuplicateWorkflow.jsp?id_workflow=${item.id}" class="btn btn-primary btn-small" title=" #i18n{module.fdw.wizard.manage_plugin_fdw-wizard.workflow.button_duplicate}">
+        <i class="icon-plus-sign icon-white"></i>
     </a>
 
-    <a class="btn btn-primary btn-mini" href="jsp/admin/plugins/workflow/ModifyWorkflow.jsp?id_workflow=${item.id}" title="modifier">
+    <a class="btn btn-primary btn-small" href="jsp/admin/plugins/workflow/ModifyWorkflow.jsp?id_workflow=${item.id}" title="modifier">
     	<i class="icon-edit icon-white"></i>
 	</a>
 </#macro>
-
-
-
-<div class="container">
+<div class="row-fluid">
+	<div class="span12">
 	<fieldset>
 	    <legend>#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.form.title}</legend>
-		<@dataTable dataTableManager=dataTableForm />
-		<br />
-		<br />
-			
-		<legend>#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.directory.title}</legend>
-		<@dataTable dataTableManager=dataTableDirectory />
-		<br />
-		<br />
-			
-		<legend>#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.workflow.title}</legend>
-	    <@dataTable dataTableManager=dataTableWorkflow />	
+		<div class="well">
+			<@dataTable dataTableManager=dataTableForm />
+		</div>
 	</fieldset>
+	<fieldset>
+		<legend>#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.directory.title}</legend>
+		<div class="well">
+			<@dataTable dataTableManager=dataTableDirectory />
+		</div>	
+	</fieldset>
+	<fieldset>	
+		<legend>#i18n{module.fdw.wizard.manage_plugin_fdw-wizard.workflow.title}</legend>
+		<div class="well">
+			<@dataTable dataTableManager=dataTableWorkflow />
+		</div>	
+	</fieldset>
+	</div>
 </div>
-<br />
-<br />
+
 
  
 

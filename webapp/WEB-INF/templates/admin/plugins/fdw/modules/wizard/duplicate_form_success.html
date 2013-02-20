@@ -1,5 +1,6 @@
-<div class="container">
-	<fieldset>
+<div class="row-fluid">  
+	<div class="span12">  
+		<fieldset>
 		<legend>
 			<#if copyMode == "formOnly" >
 				#i18n{module.fdw.wizard.duplication.form.title_simple}
@@ -11,11 +12,11 @@
 				</#if>
 			</#if>
 		</legend>
-	</fieldset>
-	${messageSuccess!}
+	<div class="alert alert-success">${messageSuccess!}</div>
 	<br /><br />
 	<a class="btn btn-primary" href="jsp/admin/plugins/fdw/modules/wizard/ManageWizard.jsp" title="#i18n{module.fdw.wizard.duplication.button_back}">
 		#i18n{module.fdw.wizard.duplication.button_back}
 	</a> 
-	<br /><br />
+	</fieldset>
+	</div>
 </div>
