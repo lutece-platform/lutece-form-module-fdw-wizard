@@ -13,18 +13,26 @@
 	<fieldset>
 		<legend>#i18n{module.fdw.wizard.duplication.form.title_choice}</legend>
 		<form method="post" action="jsp/admin/plugins/fdw/modules/wizard/DoDuplicateFormChoice.jsp?id_form=${form.idForm}" style="margin: 0px">
-			<input type="radio" name="choice" value="DuplicationSimple" checked="checked" />#i18n{module.fdw.wizard.duplication.form.choice.simple}
+			
+			<input type="radio" name="choice" value="DuplicationSimple" id="duplicationSimple" checked="checked" />
+			<label id="duplicationSimpleLabel" for="duplicationSimple" style="display: inline;">#i18n{module.fdw.wizard.duplication.form.choice.simple}</label>
+			<br /><br />
+					
 			<#if withDirectory>
-				<input type="radio" name="choice" value="DuplicationWithDirectory" />#i18n{module.fdw.wizard.duplication.form.choice.with_directory}
+				<input type="radio" name="choice" value="DuplicationWithDirectory" id="duplicationWithDirectory" />
+				<label id="duplicationWithDirectoryLabel" for="duplicationWithDirectory" style="display: inline;">#i18n{module.fdw.wizard.duplication.form.choice.with_directory}</label>
+				<br /><br />
 			</#if>
 			<#if withWorkflow >
-				<input type="radio" name="choice" value="DuplicationWithDirectoryAndWorkflow" />#i18n{module.fdw.wizard.duplication.form.choice.with_directory_and_workflow}
+				<input type="radio" name="choice" value="DuplicationWithDirectoryAndWorkflow" id="duplicationWithDirectoryAndWorkflow" />
+				<label id="duplicationWithDirectoryAndWorkflowLabel" for="duplicationWithDirectoryAndWorkflow" style="display: inline;">#i18n{module.fdw.wizard.duplication.form.choice.with_directory_and_workflow}</label>
+				<br /><br />
 			</#if>
 			<button type="submit" class="btn btn-primary" name="next" title="#i18n{module.fdw.wizard.duplication.button_next}" value="#i18n{module.fdw.wizard.duplication.button_next}" >
-				#i18n{module.fdw.wizard.duplication.button_next}
+				<i class="icon-chevron-right icon-white"></i> #i18n{module.fdw.wizard.duplication.button_next}
 			</button>
 			<button type="submit" class="btn btn-primary" name="cancel" title="#i18n{module.fdw.wizard.duplication.button_cancel}" value="#i18n{module.fdw.wizard.duplication.button_cancel}" >
-				#i18n{module.fdw.wizard.duplication.button_cancel}
+				<i class="icon-remove-circle"></i> #i18n{module.fdw.wizard.duplication.button_cancel}
 			</button>
 		</form>
 	</fieldset>
