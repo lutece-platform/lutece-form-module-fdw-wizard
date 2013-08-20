@@ -665,7 +665,9 @@ public class WizardJspBean extends PluginAdminPageJspBean
         {
             String strChoice = request.getParameter( PARAMETER_CHOICE );
 
-            if ( StringUtils.isNotBlank( strChoice ) )
+            if ( StringUtils.isNotBlank( strChoice )
+                    && ( VALUE_DIRECTORY_CHOICE_SIMPLE.equals( strChoice ) || VALUE_DIRECTORY_CHOICE_WITH_WORKFLOW
+                            .equals( strChoice ) ) )
             {
                 if ( VALUE_DIRECTORY_CHOICE_SIMPLE.equals( strChoice ) )
                 {
@@ -1045,7 +1047,10 @@ public class WizardJspBean extends PluginAdminPageJspBean
                     url = new UrlItem( AppPathService.getBaseUrl( request ) +
                             JSP_DUPLICATE_FORM_WITH_DIRECTORY_AND_WORKFLOW );
                 }
-
+                else
+                {
+                    url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MANAGE_WIZARD );
+                }
                 url.addParameter( PARAMETER_ID_FORM, nIdForm );
                 url.addParameter( PARAMETER_FROM_CHOICE, "true" );
             }
