@@ -48,20 +48,20 @@ import java.util.Locale;
  */
 public class DuplicationContext
 {
-    private Directory _directoryToCopy = null;
-    private Directory _directoryCopy = null;
-    private Form _formToCopy = null;
-    private Form _formCopy = null;
-    private Workflow _workflowToCopy = null;
-    private Workflow _workflowCopy = null;
-    private Plugin _plugin = null;
-    private Locale _locale = null;
-    private boolean _directoryDuplication = false;
-    private boolean _formDuplication = false;
-    private boolean _workflowDuplication = false;
-    private String _directoryCopyName = null;
-    private String _formCopyName = null;
-    private String _workflowCopyName = null;
+    private Directory _directoryToCopy;
+    private Directory _directoryCopy;
+    private Form _formToCopy;
+    private Form _formCopy;
+    private Workflow _workflowToCopy;
+    private Workflow _workflowCopy;
+    private Plugin _plugin;
+    private Locale _locale;
+    private boolean _directoryDuplication;
+    private boolean _formDuplication;
+    private boolean _workflowDuplication;
+    private String _directoryCopyName;
+    private String _formCopyName;
+    private String _workflowCopyName;
 
     /**
      * @return the directoryToCopy

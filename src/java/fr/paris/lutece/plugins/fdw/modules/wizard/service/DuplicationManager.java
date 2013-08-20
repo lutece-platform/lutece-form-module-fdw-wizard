@@ -50,7 +50,7 @@ public class DuplicationManager
     /**
      * Calls duplication methods of services from other plugins
      * @param context the duplication context
-     * @throws DuplicationException
+     * @throws DuplicationException the duplication exception
      */
     public static void doDuplicate( DuplicationContext context )
         throws DuplicationException

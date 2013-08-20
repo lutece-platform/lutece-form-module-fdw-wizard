@@ -70,8 +70,8 @@ import org.apache.commons.collections.iterators.EntrySetMapIterator;
  */
 public class WizardService
 {
-    private static WizardService _singleton;
     public static final String BEAN_SERVICE = "fdw-wizard.wizardService";
+    private static WizardService _singleton;
 
     //services
     private IWorkflowService _workflowService;
@@ -127,7 +127,7 @@ public class WizardService
     }
 
     /**
-     * @param _taskService the _taskService to set
+     * @param taskService the taskService to set
      */
     public void setTaskService( ITaskService taskService )
     {
@@ -170,10 +170,9 @@ public class WizardService
      * Copy a given workflow
      * @param workflowToCopy the workflow to copy
      * @param copyName the name of the copy
+     * @param locale the locale
      * @return the id of the copy
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws NoSuchMethodException
+     * @throws DuplicationException the duplication exception
      */
     public int doCopyWorkflow( Workflow workflowToCopy, String copyName, Locale locale )
         throws DuplicationException
@@ -338,6 +337,7 @@ public class WizardService
      * Copy a given directory
      * @param directoryToCopy the directory to copy
      * @param copyName the name of the copy
+     * @param plugin the plugin
      * @return the id of the copy
      */
     public int doCopyDirectory( Directory directoryToCopy, String copyName, Plugin plugin )
@@ -352,6 +352,7 @@ public class WizardService
      * Copy a given form
      * @param formToCopy the form to copy
      * @param copyName the name of the copy
+     * @param plugin the plugin
      * @return the id of the copy
      */
     public int doCopyForm( Form formToCopy, String copyName, Plugin plugin )
@@ -365,11 +366,12 @@ public class WizardService
     /**
      * Copy a given directory and its workflow
      * @param directoryToCopy the directory to copy
-     * @param copyName the name of the copy
+     * @param directoryCopyName the name of the copy
+     * @param workflowCopyName the name of the copy
+     * @param plugin the plugin
+     * @param locale the locale
      * @return the id of the copy
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws NoSuchMethodException
+     * @throws DuplicationException the duplication exception
      */
     public int doCopyDirectoryWithWorkflow( Directory directoryToCopy, String directoryCopyName,
         String workflowCopyName, Plugin plugin, Locale locale )

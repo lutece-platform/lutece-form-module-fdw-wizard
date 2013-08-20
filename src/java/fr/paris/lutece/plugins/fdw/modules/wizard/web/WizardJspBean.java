@@ -49,12 +49,6 @@ import fr.paris.lutece.plugins.form.utils.FormUtils;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.business.workflow.Workflow;
 import fr.paris.lutece.plugins.workflowcore.business.workflow.WorkflowFilter;
-import fr.paris.lutece.plugins.workflowcore.service.action.ActionService;
-import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
-import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
-import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
-import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
-import fr.paris.lutece.plugins.workflowcore.service.task.TaskService;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
@@ -181,9 +175,6 @@ public class WizardJspBean extends PluginAdminPageJspBean
 
     //services
     private IWorkflowService _workflowService = SpringContextService.getBean( WorkflowService.BEAN_SERVICE );
-    private IActionService _actionService = SpringContextService.getBean( ActionService.BEAN_SERVICE );
-    private IStateService _stateService = SpringContextService.getBean( StateService.BEAN_SERVICE );
-    private ITaskService _taskService = SpringContextService.getBean( TaskService.BEAN_SERVICE );
     private WizardService _wizardService = SpringContextService.getBean( WizardService.BEAN_SERVICE );
 
     /**
@@ -253,7 +244,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return workflow duplication page
      * @param request The Http request
      * @return Html workflow duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateWorkflow( HttpServletRequest request )
         throws AccessDeniedException
@@ -366,7 +357,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return workflow duplication success page
      * @param request The Http request
      * @return Html workflow duplication success page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateWorkflowSuccess( HttpServletRequest request )
         throws AccessDeniedException
@@ -404,7 +395,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return directory duplication page
      * @param request The Http request
      * @return Html directory duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateDirectorySimple( HttpServletRequest request )
         throws AccessDeniedException
@@ -579,7 +570,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return directory duplication success page
      * @param request The Http request
      * @return Html directory duplication success page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateDirectorySuccess( HttpServletRequest request )
         throws AccessDeniedException
@@ -618,7 +609,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return directory duplication choice page
      * @param request The Http request
      * @return Html directory duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateDirectoryChoice( HttpServletRequest request )
         throws AccessDeniedException
@@ -650,7 +641,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Chooses a duplication method
      * @param request the request
      * @return The URL of the duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String doDuplicateDirectoryChoice( HttpServletRequest request )
         throws AccessDeniedException
@@ -705,7 +696,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return directory duplication page
      * @param request The Http request
      * @return Html directory duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateDirectoryWithWorkflow( HttpServletRequest request )
         throws AccessDeniedException
@@ -743,7 +734,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return form duplication page
      * @param request The Http request
      * @return Html form duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateFormSimple( HttpServletRequest request )
         throws AccessDeniedException
@@ -940,7 +931,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return form duplication success page
      * @param request The Http request
      * @return Html form duplication success page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateFormSuccess( HttpServletRequest request )
         throws AccessDeniedException
@@ -979,7 +970,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return form duplication choice page
      * @param request The Http request
      * @return Html form duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateFormChoice( HttpServletRequest request )
         throws AccessDeniedException
@@ -1015,7 +1006,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Chooses a duplication method
      * @param request the request
      * @return The URL of the duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String doDuplicateFormChoice( HttpServletRequest request )
         throws AccessDeniedException
@@ -1075,7 +1066,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return form duplication page
      * @param request The Http request
      * @return Html form duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateFormWithDirectory( HttpServletRequest request )
         throws AccessDeniedException
@@ -1113,7 +1104,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return form duplication page
      * @param request The Http request
      * @return Html form duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateFormWithDirectoryAndWorkflow( HttpServletRequest request )
         throws AccessDeniedException
@@ -1150,9 +1141,9 @@ public class WizardJspBean extends PluginAdminPageJspBean
     /**
      * Inits the success message for directory duplication, depends on the type
      * of duplication
-     * @param request
-     * @param strCopyMode
-     * @param strDirectoryName
+     * @param request the http request
+     * @param strCopyMode the copy mode
+     * @param strDirectoryName the directory name
      * @return the success message
      */
     private String initSuccessMessageForDirectoryDuplication( HttpServletRequest request, String strCopyMode,
@@ -1180,9 +1171,9 @@ public class WizardJspBean extends PluginAdminPageJspBean
     /**
      * Inits the success message for form duplication, depends on the type
      * of duplication
-     * @param request
-     * @param strCopyMode
-     * @param strFormName
+     * @param request the http request
+     * @param strCopyMode the copy mode
+     * @param strFormName the form name
      * @return the success message
      */
     private String initSuccessMessageForFormDuplication( HttpServletRequest request, String strCopyMode,
@@ -1218,7 +1209,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return directory duplication page
      * @param request The Http request
      * @return Html directory duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateDirectory( HttpServletRequest request )
         throws AccessDeniedException
@@ -1251,7 +1242,7 @@ public class WizardJspBean extends PluginAdminPageJspBean
      * Return form duplication page
      * @param request The Http request
      * @return Html form duplication page
-     * @throws AccessDeniedException
+     * @throws AccessDeniedException the acces denied exception
      */
     public String getDuplicateForm( HttpServletRequest request )
         throws AccessDeniedException

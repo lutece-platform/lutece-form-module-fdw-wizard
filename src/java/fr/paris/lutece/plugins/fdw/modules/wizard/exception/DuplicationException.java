@@ -33,6 +33,11 @@
  */
 package fr.paris.lutece.plugins.fdw.modules.wizard.exception;
 
+/**
+ * 
+ * @author jchaline
+ * 
+ */
 public class DuplicationException extends Exception
 {
     /**
@@ -49,8 +54,8 @@ public class DuplicationException extends Exception
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message the message for the exception
+     * @param cause the cause of the exception
      */
     public DuplicationException( String message, Throwable cause )
     {
@@ -58,7 +63,7 @@ public class DuplicationException extends Exception
     }
 
     /**
-     * @param message
+     * @param message the message for the exception
      */
     public DuplicationException( String message )
     {
@@ -66,7 +71,7 @@ public class DuplicationException extends Exception
     }
 
     /**
-     * @param cause
+     * @param cause the cause of the exception
      */
     public DuplicationException( Throwable cause )
     {
