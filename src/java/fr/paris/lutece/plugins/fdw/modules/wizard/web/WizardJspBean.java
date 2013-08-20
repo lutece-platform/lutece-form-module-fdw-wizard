@@ -70,15 +70,14 @@ import fr.paris.lutece.util.datatable.DataTableManager;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.text.MessageFormat;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -462,112 +461,115 @@ public class WizardJspBean extends PluginAdminPageJspBean
             _duplicationErrorMessage = new AccessDeniedException( "Directory not found for ID " + nIdDirectory );
             url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_ERROR_DUPLICATION );
         }
-
-        if ( request.getParameter( PARAMETER_DUPLICATE ) != null )
-        {
-            String strCopyMode = request.getParameter( PARAMETER_COPY_MODE );
-            String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
-            int nIdDirectoryCopy = DirectoryUtils.CONSTANT_ID_NULL;
-            int nIdWorkflowCopy = WorkflowUtils.CONSTANT_ID_NULL;
-            String strFieldError = null;
-
-            if ( StringUtils.isBlank( strDirectoryCopyTitle ) )
-            {
-                strFieldError = FIELD_DIRECTORY_TITLE_DIRECTORY;
-            }
-
-            if ( StringUtils.isNotBlank( strFieldError ) )
-            {
-                Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
-
-                return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
-                    AdminMessage.TYPE_STOP );
-            }
-
-            try
-            {
-                if ( COPY_MODE_DIRECTORY_ONLY.equals( strCopyMode ) )
-                {
-                    // simple copy
-                    directory.setIdWorkflow( DirectoryUtils.CONSTANT_ID_NULL );
-
-                    nIdDirectoryCopy = _wizardService.doCopyDirectory( directory, strDirectoryCopyTitle, getPlugin(  ) );
-
-                    DuplicationContext context = new DuplicationContext(  );
-                    context.setLocale( this.getLocale(  ) );
-                    context.setPlugin( getPlugin(  ) );
-                    context.setDirectoryDuplication( true );
-                    context.setDirectoryToCopy( _wizardService.getDirectory( nIdDirectory, getPlugin(  ) ) );
-                    context.setDirectoryCopy( _wizardService.getDirectory( nIdDirectoryCopy, getPlugin(  ) ) );
-                    DuplicationManager.doDuplicate( context );
-                }
-                else if ( COPY_MODE_DIRECTORY_WITH_WORKFLOW.equals( strCopyMode ) )
-                {
-                    // copy with workflow
-                    int nIdWorkflowToCopy = directory.getIdWorkflow(  );
-                    String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
-
-                    if ( StringUtils.isBlank( strWorkflowCopyTitle ) )
-                    {
-                        strFieldError = FIELD_DIRECTORY_TITLE_WORKFLOW;
-                    }
-
-                    if ( StringUtils.isNotBlank( strFieldError ) )
-                    {
-                        Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
-
-                        return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
-                            AdminMessage.TYPE_STOP );
-                    }
-
-                    nIdDirectoryCopy = _wizardService.doCopyDirectoryWithWorkflow( directory, strDirectoryCopyTitle,
-                            strWorkflowCopyTitle, getPlugin(  ), this.getLocale(  ) );
-                    nIdWorkflowCopy = directory.getIdWorkflow(  );
-
-                    DuplicationContext context = new DuplicationContext(  );
-                    context.setLocale( this.getLocale(  ) );
-                    context.setPlugin( getPlugin(  ) );
-                    context.setDirectoryDuplication( true );
-                    context.setWorkflowDuplication( true );
-                    context.setDirectoryToCopy( _wizardService.getDirectory( nIdDirectory, getPlugin(  ) ) );
-                    context.setDirectoryCopy( _wizardService.getDirectory( nIdDirectoryCopy, getPlugin(  ) ) );
-                    context.setWorkflowToCopy( _wizardService.getWorkflow( nIdWorkflowToCopy ) );
-                    context.setWorkflowCopy( _wizardService.getWorkflow( nIdWorkflowCopy ) );
-                    DuplicationManager.doDuplicate( context );
-                }
-
-                // success
-                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATION_SUCCESS_DIRECTORY );
-                url.addParameter( PARAMETER_ID_DIRECTORY, nIdDirectory );
-                url.addParameter( PARAMETER_COPY_MODE, strCopyMode );
-            }
-            catch ( Exception e )
-            {
-                //rollback - delete copied directory and workflow
-                if ( nIdDirectoryCopy > 0 )
-                {
-                    DirectoryHome.remove( nIdDirectoryCopy, getPlugin(  ) );
-                }
-
-                if ( nIdWorkflowCopy > 0 )
-                {
-                    _workflowService.remove( nIdWorkflowCopy );
-                }
-
-                //go to the error page
-                _duplicationErrorMessage = e;
-                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_ERROR_DUPLICATION );
-            }
-        }
-        else if ( request.getParameter( PARAMETER_PREVIOUS ) != null )
-        {
-            url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATE_DIRECTORY_CHOICE );
-            url.addParameter( PARAMETER_ID_DIRECTORY, nIdDirectory );
-            url.addParameter( PARAMETER_FROM_CHOICE, "true" );
-        }
         else
         {
-            url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MANAGE_WIZARD );
+            if ( request.getParameter( PARAMETER_DUPLICATE ) != null )
+            {
+                String strCopyMode = request.getParameter( PARAMETER_COPY_MODE );
+                String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
+                int nIdDirectoryCopy = DirectoryUtils.CONSTANT_ID_NULL;
+                int nIdWorkflowCopy = WorkflowUtils.CONSTANT_ID_NULL;
+                String strFieldError = null;
+
+                if ( StringUtils.isBlank( strDirectoryCopyTitle ) )
+                {
+                    strFieldError = FIELD_DIRECTORY_TITLE_DIRECTORY;
+                }
+
+                if ( StringUtils.isNotBlank( strFieldError ) )
+                {
+                    Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale( ) ) };
+
+                    return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
+                            AdminMessage.TYPE_STOP );
+                }
+
+                try
+                {
+                    if ( COPY_MODE_DIRECTORY_ONLY.equals( strCopyMode ) )
+                    {
+                        // simple copy
+                        directory.setIdWorkflow( DirectoryUtils.CONSTANT_ID_NULL );
+
+                        nIdDirectoryCopy = _wizardService.doCopyDirectory( directory, strDirectoryCopyTitle,
+                                getPlugin( ) );
+
+                        DuplicationContext context = new DuplicationContext( );
+                        context.setLocale( this.getLocale( ) );
+                        context.setPlugin( getPlugin( ) );
+                        context.setDirectoryDuplication( true );
+                        context.setDirectoryToCopy( _wizardService.getDirectory( nIdDirectory, getPlugin( ) ) );
+                        context.setDirectoryCopy( _wizardService.getDirectory( nIdDirectoryCopy, getPlugin( ) ) );
+                        DuplicationManager.doDuplicate( context );
+                    }
+                    else if ( COPY_MODE_DIRECTORY_WITH_WORKFLOW.equals( strCopyMode ) )
+                    {
+                        // copy with workflow
+                        int nIdWorkflowToCopy = directory.getIdWorkflow( );
+                        String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
+
+                        if ( StringUtils.isBlank( strWorkflowCopyTitle ) )
+                        {
+                            strFieldError = FIELD_DIRECTORY_TITLE_WORKFLOW;
+                        }
+
+                        if ( StringUtils.isNotBlank( strFieldError ) )
+                        {
+                            Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale( ) ) };
+
+                            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD,
+                                    tabRequiredFields, AdminMessage.TYPE_STOP );
+                        }
+
+                        nIdDirectoryCopy = _wizardService.doCopyDirectoryWithWorkflow( directory,
+                                strDirectoryCopyTitle, strWorkflowCopyTitle, getPlugin( ), this.getLocale( ) );
+                        nIdWorkflowCopy = directory.getIdWorkflow( );
+
+                        DuplicationContext context = new DuplicationContext( );
+                        context.setLocale( this.getLocale( ) );
+                        context.setPlugin( getPlugin( ) );
+                        context.setDirectoryDuplication( true );
+                        context.setWorkflowDuplication( true );
+                        context.setDirectoryToCopy( _wizardService.getDirectory( nIdDirectory, getPlugin( ) ) );
+                        context.setDirectoryCopy( _wizardService.getDirectory( nIdDirectoryCopy, getPlugin( ) ) );
+                        context.setWorkflowToCopy( _wizardService.getWorkflow( nIdWorkflowToCopy ) );
+                        context.setWorkflowCopy( _wizardService.getWorkflow( nIdWorkflowCopy ) );
+                        DuplicationManager.doDuplicate( context );
+                    }
+
+                    // success
+                    url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATION_SUCCESS_DIRECTORY );
+                    url.addParameter( PARAMETER_ID_DIRECTORY, nIdDirectory );
+                    url.addParameter( PARAMETER_COPY_MODE, strCopyMode );
+                }
+                catch ( Exception e )
+                {
+                    //rollback - delete copied directory and workflow
+                    if ( nIdDirectoryCopy > 0 )
+                    {
+                        DirectoryHome.remove( nIdDirectoryCopy, getPlugin( ) );
+                    }
+
+                    if ( nIdWorkflowCopy > 0 )
+                    {
+                        _workflowService.remove( nIdWorkflowCopy );
+                    }
+
+                    //go to the error page
+                    _duplicationErrorMessage = e;
+                    url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_ERROR_DUPLICATION );
+                }
+            }
+            else if ( request.getParameter( PARAMETER_PREVIOUS ) != null )
+            {
+                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATE_DIRECTORY_CHOICE );
+                url.addParameter( PARAMETER_ID_DIRECTORY, nIdDirectory );
+                url.addParameter( PARAMETER_FROM_CHOICE, "true" );
+            }
+            else
+            {
+                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MANAGE_WIZARD );
+            }
         }
 
         return url.getUrl(  );
@@ -686,6 +688,10 @@ public class WizardJspBean extends PluginAdminPageJspBean
                 url.addParameter( PARAMETER_ID_DIRECTORY, nIdDirectory );
                 url.addParameter( PARAMETER_FROM_CHOICE, "true" );
             }
+            else
+            {
+                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MANAGE_WIZARD );
+            }
         }
         else
         {
@@ -793,135 +799,138 @@ public class WizardJspBean extends PluginAdminPageJspBean
             _duplicationErrorMessage = new AccessDeniedException( "Form not found for ID " + nIdForm );
             url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_ERROR_DUPLICATION );
         }
-
-        if ( request.getParameter( PARAMETER_DUPLICATE ) != null )
-        {
-            String strCopyMode = request.getParameter( PARAMETER_COPY_MODE );
-            String strFormCopyTitle = request.getParameter( PARAMETER_FORM_TITLE );
-            int nIdFormCopy = FormUtils.CONSTANT_ID_NULL;
-            String strFieldError = null;
-
-            if ( StringUtils.isBlank( strFormCopyTitle ) )
-            {
-                strFieldError = FIELD_FORM_TITLE_FORM;
-            }
-
-            if ( StringUtils.isNotBlank( strFieldError ) )
-            {
-                Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
-
-                return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
-                    AdminMessage.TYPE_STOP );
-            }
-
-            try
-            {
-                if ( COPY_MODE_FORM_ONLY.equals( strCopyMode ) )
-                {
-                    // simple copy
-                    nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin(  ) );
-
-                    DuplicationContext context = new DuplicationContext(  );
-                    context.setLocale( this.getLocale(  ) );
-                    context.setPlugin( getPlugin(  ) );
-                    context.setFormDuplication( true );
-                    context.setFormToCopy( _wizardService.getForm( nIdForm, getPlugin(  ) ) );
-                    context.setFormCopy( _wizardService.getForm( nIdFormCopy, getPlugin(  ) ) );
-                    DuplicationManager.doDuplicate( context );
-                }
-                else if ( COPY_MODE_FORM_WITH_DIRECTORY.equals( strCopyMode ) )
-                {
-                    String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
-
-                    if ( StringUtils.isBlank( strDirectoryCopyTitle ) )
-                    {
-                        strFieldError = FIELD_FORM_TITLE_DIRECTORY;
-                    }
-
-                    if ( StringUtils.isNotBlank( strFieldError ) )
-                    {
-                        Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
-
-                        return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
-                            AdminMessage.TYPE_STOP );
-                    }
-
-                    nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin(  ) );
-
-                    DuplicationContext context = new DuplicationContext(  );
-                    context.setLocale( this.getLocale(  ) );
-                    context.setPlugin( getPlugin(  ) );
-                    context.setFormDuplication( true );
-                    context.setDirectoryDuplication( true );
-                    context.setDirectoryCopyName( strDirectoryCopyTitle );
-                    context.setFormToCopy( _wizardService.getForm( nIdForm, getPlugin(  ) ) );
-                    context.setFormCopy( _wizardService.getForm( nIdFormCopy, getPlugin(  ) ) );
-                    DuplicationManager.doDuplicate( context );
-                }
-                else if ( COPY_MODE_FORM_WITH_DIRECTORY_AND_WORKFLOW.equals( strCopyMode ) )
-                {
-                    String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
-                    String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
-
-                    if ( StringUtils.isBlank( strDirectoryCopyTitle ) )
-                    {
-                        strFieldError = FIELD_FORM_TITLE_DIRECTORY;
-                    }
-                    else if ( StringUtils.isBlank( strWorkflowCopyTitle ) )
-                    {
-                        strFieldError = FIELD_FORM_TITLE_WORKFLOW;
-                    }
-
-                    if ( StringUtils.isNotBlank( strFieldError ) )
-                    {
-                        Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale(  ) ) };
-
-                        return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
-                            AdminMessage.TYPE_STOP );
-                    }
-
-                    nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin(  ) );
-
-                    DuplicationContext context = new DuplicationContext(  );
-                    context.setLocale( this.getLocale(  ) );
-                    context.setPlugin( getPlugin(  ) );
-                    context.setFormDuplication( true );
-                    context.setDirectoryDuplication( true );
-                    context.setWorkflowDuplication( true );
-                    context.setDirectoryCopyName( strDirectoryCopyTitle );
-                    context.setWorkflowCopyName( strWorkflowCopyTitle );
-                    context.setFormToCopy( _wizardService.getForm( nIdForm, getPlugin(  ) ) );
-                    context.setFormCopy( _wizardService.getForm( nIdFormCopy, getPlugin(  ) ) );
-                    DuplicationManager.doDuplicate( context );
-                }
-
-                // success
-                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATION_SUCCESS_FORM );
-                url.addParameter( PARAMETER_ID_FORM, nIdForm );
-                url.addParameter( PARAMETER_COPY_MODE, strCopyMode );
-            }
-            catch ( Exception e )
-            {
-                //rollback - delete copied form
-                if ( nIdFormCopy > 0 )
-                {
-                    FormHome.remove( nIdFormCopy, getPlugin(  ) );
-                }
-
-                //go to the error page
-                _duplicationErrorMessage = e;
-                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_ERROR_DUPLICATION );
-            }
-        }
-        else if ( request.getParameter( PARAMETER_PREVIOUS ) != null )
-        {
-            url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATE_FORM_CHOICE );
-            url.addParameter( PARAMETER_ID_FORM, nIdForm );
-            url.addParameter( PARAMETER_FROM_CHOICE, "true" );
-        }
         else
         {
-            url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MANAGE_WIZARD );
+
+            if ( request.getParameter( PARAMETER_DUPLICATE ) != null )
+            {
+                String strCopyMode = request.getParameter( PARAMETER_COPY_MODE );
+                String strFormCopyTitle = request.getParameter( PARAMETER_FORM_TITLE );
+                int nIdFormCopy = FormUtils.CONSTANT_ID_NULL;
+                String strFieldError = null;
+
+                if ( StringUtils.isBlank( strFormCopyTitle ) )
+                {
+                    strFieldError = FIELD_FORM_TITLE_FORM;
+                }
+
+                if ( StringUtils.isNotBlank( strFieldError ) )
+                {
+                    Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale( ) ) };
+
+                    return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD, tabRequiredFields,
+                            AdminMessage.TYPE_STOP );
+                }
+
+                try
+                {
+                    if ( COPY_MODE_FORM_ONLY.equals( strCopyMode ) )
+                    {
+                        // simple copy
+                        nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin( ) );
+
+                        DuplicationContext context = new DuplicationContext( );
+                        context.setLocale( this.getLocale( ) );
+                        context.setPlugin( getPlugin( ) );
+                        context.setFormDuplication( true );
+                        context.setFormToCopy( _wizardService.getForm( nIdForm, getPlugin( ) ) );
+                        context.setFormCopy( _wizardService.getForm( nIdFormCopy, getPlugin( ) ) );
+                        DuplicationManager.doDuplicate( context );
+                    }
+                    else if ( COPY_MODE_FORM_WITH_DIRECTORY.equals( strCopyMode ) )
+                    {
+                        String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
+
+                        if ( StringUtils.isBlank( strDirectoryCopyTitle ) )
+                        {
+                            strFieldError = FIELD_FORM_TITLE_DIRECTORY;
+                        }
+
+                        if ( StringUtils.isNotBlank( strFieldError ) )
+                        {
+                            Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale( ) ) };
+
+                            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD,
+                                    tabRequiredFields, AdminMessage.TYPE_STOP );
+                        }
+
+                        nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin( ) );
+
+                        DuplicationContext context = new DuplicationContext( );
+                        context.setLocale( this.getLocale( ) );
+                        context.setPlugin( getPlugin( ) );
+                        context.setFormDuplication( true );
+                        context.setDirectoryDuplication( true );
+                        context.setDirectoryCopyName( strDirectoryCopyTitle );
+                        context.setFormToCopy( _wizardService.getForm( nIdForm, getPlugin( ) ) );
+                        context.setFormCopy( _wizardService.getForm( nIdFormCopy, getPlugin( ) ) );
+                        DuplicationManager.doDuplicate( context );
+                    }
+                    else if ( COPY_MODE_FORM_WITH_DIRECTORY_AND_WORKFLOW.equals( strCopyMode ) )
+                    {
+                        String strDirectoryCopyTitle = request.getParameter( PARAMETER_DIRECTORY_TITLE );
+                        String strWorkflowCopyTitle = request.getParameter( PARAMETER_WORKFLOW_TITLE );
+
+                        if ( StringUtils.isBlank( strDirectoryCopyTitle ) )
+                        {
+                            strFieldError = FIELD_FORM_TITLE_DIRECTORY;
+                        }
+                        else if ( StringUtils.isBlank( strWorkflowCopyTitle ) )
+                        {
+                            strFieldError = FIELD_FORM_TITLE_WORKFLOW;
+                        }
+
+                        if ( StringUtils.isNotBlank( strFieldError ) )
+                        {
+                            Object[] tabRequiredFields = { I18nService.getLocalizedString( strFieldError, getLocale( ) ) };
+
+                            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELD,
+                                    tabRequiredFields, AdminMessage.TYPE_STOP );
+                        }
+
+                        nIdFormCopy = _wizardService.doCopyForm( form, strFormCopyTitle, getPlugin( ) );
+
+                        DuplicationContext context = new DuplicationContext( );
+                        context.setLocale( this.getLocale( ) );
+                        context.setPlugin( getPlugin( ) );
+                        context.setFormDuplication( true );
+                        context.setDirectoryDuplication( true );
+                        context.setWorkflowDuplication( true );
+                        context.setDirectoryCopyName( strDirectoryCopyTitle );
+                        context.setWorkflowCopyName( strWorkflowCopyTitle );
+                        context.setFormToCopy( _wizardService.getForm( nIdForm, getPlugin( ) ) );
+                        context.setFormCopy( _wizardService.getForm( nIdFormCopy, getPlugin( ) ) );
+                        DuplicationManager.doDuplicate( context );
+                    }
+
+                    // success
+                    url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATION_SUCCESS_FORM );
+                    url.addParameter( PARAMETER_ID_FORM, nIdForm );
+                    url.addParameter( PARAMETER_COPY_MODE, strCopyMode );
+                }
+                catch ( Exception e )
+                {
+                    //rollback - delete copied form
+                    if ( nIdFormCopy > 0 )
+                    {
+                        FormHome.remove( nIdFormCopy, getPlugin( ) );
+                    }
+
+                    //go to the error page
+                    _duplicationErrorMessage = e;
+                    url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_ERROR_DUPLICATION );
+                }
+            }
+            else if ( request.getParameter( PARAMETER_PREVIOUS ) != null )
+            {
+                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_DUPLICATE_FORM_CHOICE );
+                url.addParameter( PARAMETER_ID_FORM, nIdForm );
+                url.addParameter( PARAMETER_FROM_CHOICE, "true" );
+            }
+            else
+            {
+                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MANAGE_WIZARD );
+            }
         }
 
         return url.getUrl(  );
@@ -1048,6 +1057,10 @@ public class WizardJspBean extends PluginAdminPageJspBean
 
                 url.addParameter( PARAMETER_ID_FORM, nIdForm );
                 url.addParameter( PARAMETER_FROM_CHOICE, "true" );
+            }
+            else
+            {
+                url = new UrlItem( AppPathService.getBaseUrl( request ) + JSP_MANAGE_WIZARD );
             }
         }
         else

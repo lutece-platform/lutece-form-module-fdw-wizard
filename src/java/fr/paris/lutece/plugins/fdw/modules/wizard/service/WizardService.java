@@ -53,15 +53,14 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.method.MethodUtil;
 
-import org.apache.commons.collections.iterators.EntrySetMapIterator;
-
 import java.lang.reflect.InvocationTargetException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.apache.commons.collections.iterators.EntrySetMapIterator;
 
 
 /**
@@ -93,7 +92,7 @@ public class WizardService
      *
      * @return The instance of the singleton
      */
-    public static WizardService getInstance(  )
+    public static synchronized WizardService getInstance( )
     {
         if ( _singleton == null )
         {
