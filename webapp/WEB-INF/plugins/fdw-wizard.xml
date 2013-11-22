@@ -3,7 +3,7 @@
     <!-- Plugin Informations -->
     <name>fdw-wizard</name>
     <class>fr.paris.lutece.plugins.fdw.modules.wizard.service.WizardPlugin</class>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <description>module.fdw.wizard.plugin.description</description>
     <documentation/>
     <installation/>
