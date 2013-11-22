@@ -298,7 +298,7 @@ public class WizardService
         Integer nIdTaskToCopy = taskToCopy.getId(  );
 
         //get the maximum order number in this workflow and set max+1
-        int nMaximumOrder = _taskService.findMaximumOrderByWorkflowId( taskToCopy.getAction(  ).getId(  ) );
+        int nMaximumOrder = _taskService.findMaximumOrderByActionId( taskToCopy.getAction( ).getId( ) );
         taskToCopy.setOrder( nMaximumOrder + 1 );
 
         // Create the new task (taskToCopy id will be update with the new idTask)
