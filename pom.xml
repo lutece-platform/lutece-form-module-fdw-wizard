@@ -61,7 +61,7 @@
             <groupId>fr.paris.lutece.plugins</groupId>
             <artifactId>library-workflow-core</artifactId>
             <version>1.0.4</version>
-            <type>lutece-plugin</type>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
